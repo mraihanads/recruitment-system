@@ -36,9 +36,11 @@ use Illuminate\Support\Facades\Route;
 |--------------------------------------------------------------------------
 */
 
-// Public Authentication
+// Public Authentication & Exploration
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login'])->name('login');
+Route::get('/public/jobs', [JobController::class, 'index']);
+Route::get('/public/job-categories', [JobController::class, 'categories']);
 
 // Authenticated Routes
 Route::middleware('auth:sanctum')->group(function () {

@@ -1,9 +1,72 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import api from '../../services/api';
+
+const employmentTypeMap = {
+  full_time: 'Full Time',
+  part_time: 'Part Time',
+  internship: 'Internship',
+  freelance: 'Freelance',
+  contract: 'Kontrak',
+};
+
+const formatSalary = (min, max) => {
+  if (!min && !max) return 'Gaji Dirahasiakan';
+  const fmt = (val) =>
+    new Intl.NumberFormat('id-ID', {
+      style: 'currency',
+      currency: 'IDR',
+      maximumFractionDigits: 0,
+    }).format(val);
+  if (min && max) return `${fmt(min)} - ${fmt(max)}`;
+  if (min) return `Mulai ${fmt(min)}`;
+  return `Hingga ${fmt(max)}`;
+};
+
+const formatDeadline = (dateStr) => {
+  if (!dateStr) return '-';
+  try {
+    return new Date(dateStr).toLocaleDateString('id-ID', {
+      day: 'numeric',
+      month: 'short',
+      year: 'numeric',
+    });
+  } catch {
+    return dateStr;
+  }
+};
 
 const LandingPage = () => {
   const { isAuthenticated, role, user } = useAuth();
+  const [featuredJobs, setFeaturedJobs] = useState([]);
+  const [loadingJobs, setLoadingJobs] = useState(true);
+
+  useEffect(() => {
+    let isMounted = true;
+    const fetchFeaturedJobs = async () => {
+      try {
+        const response = await api.get('/public/jobs', { params: { per_page: 3 } });
+        const list = response.data?.data?.data || response.data?.data || [];
+        if (isMounted) {
+          setFeaturedJobs(Array.isArray(list) ? list : []);
+        }
+      } catch {
+        if (isMounted) {
+          setFeaturedJobs([]);
+        }
+      } finally {
+        if (isMounted) {
+          setLoadingJobs(false);
+        }
+      }
+    };
+
+    fetchFeaturedJobs();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   const getDashboardPath = () => {
     if (role === 'admin') return '/admin/dashboard';
@@ -17,50 +80,16 @@ const LandingPage = () => {
     return '/jobs';
   };
 
-  const sampleFeaturedJobs = [
-    {
-      id: 1,
-      title: 'Senior Frontend Engineer (React)',
-      company: 'PT Inovasi Digital Nusantara',
-      location: 'Jakarta Selatan (Hybrid)',
-      type: 'Full Time',
-      category: 'Teknologi Informasi',
-      salary: 'Rp 15.000.000 - Rp 25.000.000',
-      skills: ['React', 'JavaScript', 'Tailwind CSS', 'TypeScript'],
-      deadline: '31 Des 2026',
-    },
-    {
-      id: 2,
-      title: 'Backend Developer (Laravel / PHP)',
-      company: 'TechSolusi Global',
-      location: 'Bandung (Remote)',
-      type: 'Full Time',
-      category: 'Teknologi Informasi',
-      salary: 'Rp 12.000.000 - Rp 20.000.000',
-      skills: ['Laravel', 'PHP', 'MySQL', 'REST API'],
-      deadline: '15 Nov 2026',
-    },
-    {
-      id: 3,
-      title: 'UI/UX & Product Designer',
-      company: 'Kreatif Studio Indonesia',
-      location: 'Surabaya (On-site)',
-      type: 'Full Time',
-      category: 'Desain Grafis & Multimedia',
-      salary: 'Rp 8.000.000 - Rp 14.000.000',
-      skills: ['Figma', 'UI/UX Design', 'User Research', 'Prototyping'],
-      deadline: '20 Des 2026',
-    },
-  ];
-
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col font-sans text-slate-800">
       {/* 1. TOP NAVBAR */}
       <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-slate-200 px-6 sm:px-10 py-3.5 flex items-center justify-between shadow-xs">
         <Link to="/" className="flex items-center gap-3 group">
-          <div className="w-10 h-10 rounded-xl bg-blue-600 text-white font-extrabold flex items-center justify-center text-lg shadow-md shadow-blue-500/20 group-hover:scale-105 transition-transform">
-            JC
-          </div>
+          <img
+            src="/logo.png"
+            alt="JobConnect"
+            className="w-10 h-10 rounded-xl object-contain shadow-md shadow-blue-500/20 group-hover:scale-105 transition-transform"
+          />
           <div className="flex flex-col">
             <span className="font-extrabold text-slate-900 text-lg tracking-tight leading-none">JobConnect</span>
             <span className="text-[10px] font-semibold text-blue-600 tracking-wider uppercase mt-0.5">Talent Matching</span>
@@ -292,64 +321,110 @@ const LandingPage = () => {
             </Link>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {sampleFeaturedJobs.map((job) => (
-              <div
-                key={job.id}
-                className="bg-white rounded-2xl border border-slate-200/90 p-5 shadow-xs hover:shadow-md hover:border-blue-200 transition-all flex flex-col justify-between"
-              >
-                <div>
-                  <div className="flex items-start justify-between gap-2 mb-3">
-                    <span className="inline-block px-2.5 py-1 rounded-lg text-[11px] font-semibold bg-blue-50 text-blue-700 border border-blue-100">
-                      {job.category}
-                    </span>
-                    <span className="inline-block px-2 py-0.5 rounded-md text-[10px] font-bold bg-slate-100 text-slate-600">
-                      {job.type}
-                    </span>
+          {loadingJobs ? (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="bg-white rounded-2xl border border-slate-200/90 p-5 shadow-xs animate-pulse">
+                  <div className="flex justify-between mb-4">
+                    <div className="h-5 w-24 bg-slate-200 rounded"></div>
+                    <div className="h-5 w-16 bg-slate-200 rounded"></div>
                   </div>
-
-                  <h4 className="text-base font-bold text-slate-900 mb-1 hover:text-blue-600 transition-colors">
-                    {job.title}
-                  </h4>
-                  <p className="text-xs font-semibold text-slate-500 mb-3">{job.company}</p>
-
-                  <div className="space-y-1 text-xs text-slate-500 mb-4">
-                    <div className="flex items-center gap-1.5">
-                      <svg className="w-3.5 h-3.5 text-slate-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                      </svg>
-                      <span className="truncate">{job.location}</span>
-                    </div>
-                    <div className="flex items-center gap-1.5 text-emerald-600 font-semibold">
-                      <svg className="w-3.5 h-3.5 text-emerald-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                      </svg>
-                      <span>{job.salary}</span>
-                    </div>
-                  </div>
-
-                  <div className="flex flex-wrap gap-1.5 mb-4">
-                    {job.skills.map((s, idx) => (
-                      <span key={idx} className="px-2 py-0.5 rounded-md text-[10px] font-medium bg-slate-50 text-slate-600 border border-slate-200">
-                        {s}
-                      </span>
-                    ))}
+                  <div className="h-6 w-3/4 bg-slate-200 rounded mb-2"></div>
+                  <div className="h-4 w-1/2 bg-slate-200 rounded mb-4"></div>
+                  <div className="h-4 w-full bg-slate-200 rounded mb-2"></div>
+                  <div className="h-4 w-2/3 bg-slate-200 rounded mb-4"></div>
+                  <div className="pt-3 border-t border-slate-100 flex justify-between">
+                    <div className="h-4 w-20 bg-slate-200 rounded"></div>
+                    <div className="h-8 w-24 bg-slate-200 rounded-xl"></div>
                   </div>
                 </div>
-
-                <div className="pt-3 border-t border-slate-100 flex items-center justify-between">
-                  <span className="text-[11px] text-slate-400">Batas: {job.deadline}</span>
-                  <Link
-                    to={getJobsPath()}
-                    className="px-3.5 py-1.5 rounded-xl bg-blue-50 hover:bg-blue-600 hover:text-white text-blue-700 text-xs font-bold transition-all"
-                  >
-                    Detail & Lamar
-                  </Link>
-                </div>
+              ))}
+            </div>
+          ) : featuredJobs.length === 0 ? (
+            <div className="text-center py-12 px-6 bg-slate-50/80 rounded-2xl border border-dashed border-slate-200">
+              <div className="w-12 h-12 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center mx-auto mb-3 shadow-xs">
+                <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                </svg>
               </div>
-            ))}
-          </div>
+              <h4 className="text-sm font-bold text-slate-800 mb-1">Belum Ada Lowongan Pekerjaan Aktif</h4>
+              <p className="text-xs text-slate-500 max-w-md mx-auto mb-4 leading-relaxed">
+                Lowongan pekerjaan dari perusahaan terverifikasi akan langsung muncul di sini setelah dipublikasikan oleh recruiter.
+              </p>
+              <Link
+                to={getJobsPath()}
+                className="inline-flex items-center gap-1.5 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold transition-all shadow-xs"
+              >
+                <span>Jelajahi Portal Lowongan</span>
+                <span>&rarr;</span>
+              </Link>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {featuredJobs.map((job) => (
+                <div
+                  key={job.id}
+                  className="bg-white rounded-2xl border border-slate-200/90 p-5 shadow-xs hover:shadow-md hover:border-blue-200 transition-all flex flex-col justify-between"
+                >
+                  <div>
+                    <div className="flex items-start justify-between gap-2 mb-3">
+                      <span className="inline-block px-2.5 py-1 rounded-lg text-[11px] font-semibold bg-blue-50 text-blue-700 border border-blue-100">
+                        {job.category?.name || 'Umum'}
+                      </span>
+                      <span className="inline-block px-2 py-0.5 rounded-md text-[10px] font-bold bg-slate-100 text-slate-600">
+                        {employmentTypeMap[job.employment_type] || job.employment_type || 'Full Time'}
+                      </span>
+                    </div>
+
+                    <h4 className="text-base font-bold text-slate-900 mb-1 hover:text-blue-600 transition-colors">
+                      {job.title}
+                    </h4>
+                    <p className="text-xs font-semibold text-slate-500 mb-3">
+                      {job.company?.company_name || 'Perusahaan Terverifikasi'}
+                    </p>
+
+                    <div className="space-y-1 text-xs text-slate-500 mb-4">
+                      <div className="flex items-center gap-1.5">
+                        <svg className="w-3.5 h-3.5 text-slate-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                        </svg>
+                        <span className="truncate">{job.location || 'Indonesia'}</span>
+                      </div>
+                      <div className="flex items-center gap-1.5 text-emerald-600 font-semibold">
+                        <svg className="w-3.5 h-3.5 text-emerald-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <span>{formatSalary(job.salary_min, job.salary_max)}</span>
+                      </div>
+                    </div>
+
+                    {Array.isArray(job.skills) && job.skills.length > 0 && (
+                      <div className="flex flex-wrap gap-1.5 mb-4">
+                        {job.skills.slice(0, 4).map((s, idx) => (
+                          <span key={s.id || idx} className="px-2 py-0.5 rounded-md text-[10px] font-medium bg-slate-50 text-slate-600 border border-slate-200">
+                            {s.name || s}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="pt-3 border-t border-slate-100 flex items-center justify-between">
+                    <span className="text-[11px] text-slate-400">
+                      Batas: {formatDeadline(job.deadline)}
+                    </span>
+                    <Link
+                      to={getJobsPath()}
+                      className="px-3.5 py-1.5 rounded-xl bg-blue-50 hover:bg-blue-600 hover:text-white text-blue-700 text-xs font-bold transition-all"
+                    >
+                      Detail & Lamar
+                    </Link>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </section>
 
@@ -446,9 +521,11 @@ const LandingPage = () => {
       <footer className="bg-slate-900 text-slate-400 py-10 px-6 sm:px-10 border-t border-slate-800 text-xs">
         <div className="max-w-5xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-blue-600 text-white font-black flex items-center justify-center text-sm">
-              JC
-            </div>
+            <img
+              src="/logo.png"
+              alt="JobConnect"
+              className="w-8 h-8 rounded-lg object-contain bg-white/10 p-0.5"
+            />
             <span className="font-bold text-white text-sm">JobConnect</span>
             <span className="text-slate-500">|</span>
             <span>Sistem Informasi Rekrutmen & Pencocokan Kandidat</span>

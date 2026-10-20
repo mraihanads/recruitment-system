@@ -61,9 +61,11 @@ const Login = () => {
       <div className="w-full max-w-md bg-white/95 backdrop-blur-md rounded-2xl shadow-2xl border border-slate-100 p-8 sm:p-10">
         {/* Header */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-14 h-14 rounded-xl bg-blue-600 text-white font-extrabold text-2xl shadow-lg shadow-blue-500/30 mb-4">
-            JC
-          </div>
+          <img
+            src="/logo.png"
+            alt="JobConnect"
+            className="w-16 h-16 rounded-2xl object-contain mx-auto mb-4 drop-shadow-md"
+          />
           <h1 className="text-2xl font-bold text-slate-800 tracking-tight">Selamat Datang</h1>
           <p className="text-slate-500 text-sm mt-1">
             Masuk ke JobConnect — Sistem Rekrutmen & Pencocokan Kandidat
