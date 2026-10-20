@@ -127,7 +127,7 @@ const JobsPage = () => {
           />
           <div className="flex flex-col">
             <span className="font-extrabold text-slate-900 text-lg tracking-tight leading-none">JobConnect</span>
-            <span className="text-[10px] font-semibold text-blue-600 tracking-wider uppercase mt-0.5">Eksplorasi Karir</span>
+            <span className="text-[10px] font-semibold text-blue-600 tracking-wider uppercase mt-0.5">Talent Matching</span>
           </div>
         </Link>
 
