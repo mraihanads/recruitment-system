@@ -1,4 +1,4 @@
-# RecruitMatch — Sistem Informasi Rekrutmen dan Pencocokan Kandidat dengan Lowongan Kerja Berbasis Web
+# JobConnect — Sistem Informasi Rekrutmen dan Pencocokan Kandidat dengan Lowongan Kerja Berbasis Web
 
 [![Laravel](https://img.shields.io/badge/Laravel-11.x-FF2D20?style=for-the-badge&logo=laravel)](https://laravel.com)
 [![React](https://img.shields.io/badge/React-19.x-61DAFB?style=for-the-badge&logo=react)](https://react.dev)
@@ -10,7 +10,7 @@
 
 ## 1. Deskripsi Project
 
-**RecruitMatch** adalah platform sistem informasi rekrutmen berbasis web terpadu yang dirancang untuk mempertemukan pencari kerja (kandidat) dengan perusahaan (recruiter) serta diawasi oleh administrator. Platform ini dilengkapi algoritma **Skill Matching** otomatis yang menghitung persentase kecocokan antara keahlian yang dimiliki kandidat dan kriteria teknis yang disyaratkan oleh lowongan kerja, sehingga proses seleksi awal menjadi lebih akurat, objektif, dan transparan.
+**JobConnect** adalah platform sistem informasi rekrutmen berbasis web terpadu yang dirancang untuk mempertemukan pencari kerja (kandidat) dengan perusahaan (recruiter) serta diawasi oleh administrator. Platform ini dilengkapi algoritma **Skill Matching** otomatis yang menghitung persentase kecocokan antara keahlian yang dimiliki kandidat dan kriteria teknis yang disyaratkan oleh lowongan kerja, sehingga proses seleksi awal menjadi lebih akurat, objektif, dan transparan.
 
 ---
 

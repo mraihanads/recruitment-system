@@ -59,10 +59,10 @@ const LandingPage = () => {
       <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-slate-200 px-6 sm:px-10 py-3.5 flex items-center justify-between shadow-xs">
         <Link to="/" className="flex items-center gap-3 group">
           <div className="w-10 h-10 rounded-xl bg-blue-600 text-white font-extrabold flex items-center justify-center text-lg shadow-md shadow-blue-500/20 group-hover:scale-105 transition-transform">
-            RM
+            JC
           </div>
           <div className="flex flex-col">
-            <span className="font-extrabold text-slate-900 text-lg tracking-tight leading-none">RecruitMatch</span>
+            <span className="font-extrabold text-slate-900 text-lg tracking-tight leading-none">JobConnect</span>
             <span className="text-[10px] font-semibold text-blue-600 tracking-wider uppercase mt-0.5">Talent Matching</span>
           </div>
         </Link>
@@ -116,7 +116,7 @@ const LandingPage = () => {
           </h1>
 
           <p className="text-slate-600 text-sm sm:text-lg mb-8 leading-relaxed max-w-2xl mx-auto">
-            RecruitMatch menghadirkan sistem pencocokan cerdas antara kualifikasi keahlian kandidat dan kriteria lowongan perusahaan secara transparan, terukur, dan efisien.
+            JobConnect menghadirkan sistem pencocokan cerdas antara kualifikasi keahlian kandidat dan kriteria lowongan perusahaan secara transparan, terukur, dan efisien.
           </p>
 
           <div className="flex flex-wrap items-center justify-center gap-3.5 sm:gap-4">
@@ -174,7 +174,7 @@ const LandingPage = () => {
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-12">
             <h2 className="text-xs font-bold uppercase tracking-wider text-blue-600 mb-2">Alur Mudah & Transparan</h2>
-            <h3 className="text-2xl sm:text-3xl font-black text-slate-900">Cara Kerja RecruitMatch</h3>
+            <h3 className="text-2xl sm:text-3xl font-black text-slate-900">Cara Kerja JobConnect</h3>
             <p className="text-slate-500 text-xs sm:text-sm mt-2 max-w-xl mx-auto">
               Hanya butuh 4 tahapan ringkas untuk menghubungkan keahlian Anda dengan lowongan yang paling relevan.
             </p>
@@ -358,7 +358,7 @@ const LandingPage = () => {
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-12">
             <h2 className="text-xs font-bold uppercase tracking-wider text-blue-600 mb-2">Mengapa Memilih Kami</h2>
-            <h3 className="text-2xl sm:text-3xl font-black text-slate-900">Keunggulan Platform RecruitMatch</h3>
+            <h3 className="text-2xl sm:text-3xl font-black text-slate-900">Keunggulan Platform JobConnect</h3>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -412,7 +412,7 @@ const LandingPage = () => {
             Siap Memulai Langkah Karirmu Selanjutnya?
           </h2>
           <p className="text-blue-100 text-xs sm:text-base mb-8 max-w-xl mx-auto leading-relaxed">
-            Bergabunglah sekarang dengan ratusan kandidat dan perusahaan terkemuka yang telah mempercayai RecruitMatch.
+            Bergabunglah sekarang dengan ratusan kandidat dan perusahaan terkemuka yang telah mempercayai JobConnect.
           </p>
           <div className="flex flex-wrap items-center justify-center gap-4">
             {!isAuthenticated ? (
@@ -447,9 +447,9 @@ const LandingPage = () => {
         <div className="max-w-5xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 rounded-lg bg-blue-600 text-white font-black flex items-center justify-center text-sm">
-              RM
+              JC
             </div>
-            <span className="font-bold text-white text-sm">RecruitMatch</span>
+            <span className="font-bold text-white text-sm">JobConnect</span>
             <span className="text-slate-500">|</span>
             <span>Sistem Informasi Rekrutmen & Pencocokan Kandidat</span>
           </div>
@@ -462,7 +462,7 @@ const LandingPage = () => {
         </div>
 
         <div className="max-w-5xl mx-auto mt-6 pt-6 border-t border-slate-800 text-center text-slate-500 text-[11px]">
-          &copy; {new Date().getFullYear()} RecruitMatch. Hak Cipta Dilindungi Undang-Undang.
+          &copy; {new Date().getFullYear()} JobConnect. Hak Cipta Dilindungi Undang-Undang.
         </div>
       </footer>
     </div>

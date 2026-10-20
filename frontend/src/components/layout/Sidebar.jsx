@@ -22,11 +22,11 @@ const Sidebar = ({ menuItems = [], roleLabel = 'Portal', isMobileOpen = false, o
           className="flex items-center gap-3 group"
         >
           <div className="w-10 h-10 rounded-xl bg-blue-600 text-white font-extrabold flex items-center justify-center text-lg shadow-md shadow-blue-500/20 group-hover:scale-105 transition-transform">
-            RM
+            JC
           </div>
           <div>
             <span className="font-extrabold text-slate-800 text-lg tracking-tight block leading-tight">
-              RecruitMatch
+              JobConnect
             </span>
             <span className="text-[11px] font-semibold text-slate-400 block tracking-wide uppercase">
               {roleLabel}

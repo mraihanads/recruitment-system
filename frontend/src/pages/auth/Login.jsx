@@ -62,11 +62,11 @@ const Login = () => {
         {/* Header */}
         <div className="text-center mb-8">
           <div className="inline-flex items-center justify-center w-14 h-14 rounded-xl bg-blue-600 text-white font-extrabold text-2xl shadow-lg shadow-blue-500/30 mb-4">
-            SR
+            JC
           </div>
           <h1 className="text-2xl font-bold text-slate-800 tracking-tight">Selamat Datang</h1>
           <p className="text-slate-500 text-sm mt-1">
-            Masuk ke Sistem Rekrutmen & Pencocokan Kandidat
+            Masuk ke JobConnect — Sistem Rekrutmen & Pencocokan Kandidat
           </p>
         </div>
 

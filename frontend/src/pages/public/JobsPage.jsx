@@ -141,10 +141,10 @@ const JobsPage = () => {
       <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-slate-200 px-6 sm:px-10 py-3.5 flex items-center justify-between shadow-xs">
         <Link to="/" className="flex items-center gap-3 group">
           <div className="w-10 h-10 rounded-xl bg-blue-600 text-white font-extrabold flex items-center justify-center text-lg shadow-md shadow-blue-500/20 group-hover:scale-105 transition-transform">
-            RM
+            JC
           </div>
           <div className="flex flex-col">
-            <span className="font-extrabold text-slate-900 text-lg tracking-tight leading-none">RecruitMatch</span>
+            <span className="font-extrabold text-slate-900 text-lg tracking-tight leading-none">JobConnect</span>
             <span className="text-[10px] font-semibold text-blue-600 tracking-wider uppercase mt-0.5">Eksplorasi Karir</span>
           </div>
         </Link>
@@ -330,7 +330,7 @@ const JobsPage = () => {
 
       {/* Footer */}
       <footer className="bg-white border-t border-slate-200 py-6 px-6 text-center text-xs text-slate-500">
-        &copy; {new Date().getFullYear()} RecruitMatch. Sistem Rekrutmen & Pencocokan Kandidat.
+        &copy; {new Date().getFullYear()} JobConnect. Sistem Rekrutmen & Pencocokan Kandidat.
       </footer>
     </div>
   );
