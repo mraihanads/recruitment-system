@@ -6,6 +6,7 @@ import LoadingScreen from '../../components/common/LoadingScreen';
 const CreateJob = () => {
   const navigate = useNavigate();
 
+  const [company, setCompany] = useState(null);
   const [categories, setCategories] = useState([]);
   const [masterSkills, setMasterSkills] = useState([]);
   const [initLoading, setInitLoading] = useState(true);
@@ -34,12 +35,14 @@ const CreateJob = () => {
   useEffect(() => {
     const fetchMasterData = async () => {
       try {
-        const [catsRes, skillsRes] = await Promise.all([
+        const [catsRes, skillsRes, profileRes] = await Promise.all([
           companyService.getJobCategories(),
           companyService.getMasterSkills(),
+          companyService.getProfile().catch(() => null),
         ]);
         if (catsRes?.data) setCategories(catsRes.data);
         if (skillsRes?.data) setMasterSkills(skillsRes.data);
+        if (profileRes?.data) setCompany(profileRes.data);
       } catch (err) {
         setErrorMessage('Gagal memuat kategori atau keahlian dari server.');
       } finally {
@@ -140,6 +143,75 @@ const CreateJob = () => {
 
   if (initLoading) {
     return <LoadingScreen message="Menyiapkan formulir lowongan..." />;
+  }
+
+  // Block access if company is not verified
+  if (company && company.verification_status !== 'verified') {
+    const statusMsg = {
+      pending: {
+        title: 'Perusahaan Sedang Dalam Proses Verifikasi',
+        desc: 'Dokumen legalitas Anda sedang ditinjau oleh admin. Harap tunggu persetujuan sebelum dapat membuat lowongan pekerjaan.',
+        badge: 'Menunggu Persetujuan',
+        badgeColor: 'bg-amber-100 text-amber-700',
+      },
+      rejected: {
+        title: 'Verifikasi Perusahaan Ditolak',
+        desc: 'Verifikasi perusahaan Anda ditolak. Silakan unggah ulang dokumen legalitas yang valid dan hubungi admin untuk informasi lebih lanjut.',
+        badge: 'Ditolak',
+        badgeColor: 'bg-rose-100 text-rose-700',
+      },
+    }[company.verification_status] || {
+      title: 'Perusahaan Belum Terverifikasi',
+      desc: 'Silakan unggah dokumen legalitas perusahaan Anda terlebih dahulu dan tunggu persetujuan dari admin.',
+      badge: 'Belum Terverifikasi',
+      badgeColor: 'bg-slate-100 text-slate-600',
+    };
+
+    return (
+      <div className="space-y-6 pb-12 max-w-4xl mx-auto">
+        <div className="flex items-center justify-between">
+          <Link
+            to="/company/jobs"
+            className="inline-flex items-center gap-2 text-xs font-bold text-slate-500 hover:text-blue-600 transition-colors"
+          >
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            </svg>
+            Kembali ke Daftar Lowongan
+          </Link>
+        </div>
+
+        <div className="bg-white rounded-3xl border border-amber-200 p-8 sm:p-12 shadow-xs text-center">
+          <div className="w-16 h-16 rounded-2xl bg-amber-50 flex items-center justify-center mx-auto mb-5">
+            <svg className="w-8 h-8 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+            </svg>
+          </div>
+          <span className={`inline-block px-3 py-1 rounded-full text-xs font-bold mb-4 ${statusMsg.badgeColor}`}>
+            {statusMsg.badge}
+          </span>
+          <h2 className="text-xl sm:text-2xl font-black text-slate-900 mb-3">{statusMsg.title}</h2>
+          <p className="text-sm text-slate-500 max-w-md mx-auto leading-relaxed mb-7">{statusMsg.desc}</p>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+            <Link
+              to="/company/documents"
+              className="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm transition-colors inline-flex items-center gap-2"
+            >
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+              </svg>
+              Upload Dokumen Legalitas
+            </Link>
+            <Link
+              to="/company/jobs"
+              className="px-5 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-sm transition-colors"
+            >
+              Kembali ke Lowongan
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   const filteredSkills = masterSkills.filter((s) =>

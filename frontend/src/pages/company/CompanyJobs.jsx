@@ -58,6 +58,7 @@ const CompanyJobs = () => {
 
   const [jobs, setJobs] = useState([]);
   const [categories, setCategories] = useState([]);
+  const [company, setCompany] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -79,9 +80,10 @@ const CompanyJobs = () => {
       if (statusFilter) params.status = statusFilter;
       if (categoryFilter) params.category_id = categoryFilter;
 
-      const [jobsRes, catsRes] = await Promise.all([
+      const [jobsRes, catsRes, profileRes] = await Promise.all([
         companyService.getJobs(params),
         categories.length === 0 ? companyService.getJobCategories().catch(() => ({ data: [] })) : Promise.resolve({ data: categories }),
+        companyService.getProfile().catch(() => null),
       ]);
 
       if (jobsRes?.success) {
@@ -89,6 +91,9 @@ const CompanyJobs = () => {
       }
       if (catsRes?.data && categories.length === 0) {
         setCategories(catsRes.data || []);
+      }
+      if (profileRes?.data) {
+        setCompany(profileRes.data);
       }
     } catch (err) {
       setError(err.response?.data?.message || 'Gagal memuat daftar lowongan pekerjaan.');
@@ -159,6 +164,8 @@ const CompanyJobs = () => {
     }
   };
 
+  const isVerified = company?.verification_status === 'verified';
+
   return (
     <div className="space-y-6 pb-12">
       {/* Header Banner */}
@@ -170,17 +177,59 @@ const CompanyJobs = () => {
           </p>
         </div>
 
-        <Link
-          to="/company/jobs/create"
-          className="px-4 py-2.5 rounded-xl bg-white text-blue-700 hover:bg-blue-50 font-bold text-xs sm:text-sm shadow-sm transition-all inline-flex items-center gap-2 shrink-0"
-          data-testid="create-job-button"
-        >
-          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" />
-          </svg>
-          Tambah Lowongan Baru
-        </Link>
+        {isVerified ? (
+          <Link
+            to="/company/jobs/create"
+            className="px-4 py-2.5 rounded-xl bg-white text-blue-700 hover:bg-blue-50 font-bold text-xs sm:text-sm shadow-sm transition-all inline-flex items-center gap-2 shrink-0"
+            data-testid="create-job-button"
+          >
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" />
+            </svg>
+            Tambah Lowongan Baru
+          </Link>
+        ) : (
+          <button
+            disabled
+            title="Perusahaan belum terverifikasi oleh admin"
+            className="px-4 py-2.5 rounded-xl bg-white/30 text-white/60 font-bold text-xs sm:text-sm cursor-not-allowed inline-flex items-center gap-2 shrink-0"
+          >
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" />
+            </svg>
+            Tambah Lowongan Baru
+          </button>
+        )}
       </div>
+
+      {/* Verification Warning Banner */}
+      {!isVerified && company !== null && (
+        <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4 flex items-start gap-3">
+          <div className="shrink-0 w-9 h-9 rounded-xl bg-amber-100 flex items-center justify-center">
+            <svg className="w-5 h-5 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" />
+            </svg>
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="font-bold text-amber-800 text-sm mb-0.5">
+              Perusahaan Belum Terverifikasi
+            </p>
+            <p className="text-xs text-amber-700 leading-relaxed">
+              {company?.verification_status === 'pending'
+                ? 'Dokumen Anda sedang ditinjau oleh admin. Harap tunggu persetujuan sebelum membuat atau mengaktifkan lowongan.'
+                : company?.verification_status === 'rejected'
+                ? 'Verifikasi perusahaan Anda ditolak. Silakan unggah ulang dokumen legalitas yang valid dan hubungi admin.'
+                : 'Silakan unggah dokumen legalitas perusahaan terlebih dahulu dan tunggu persetujuan dari admin.'}
+            </p>
+            <Link
+              to="/company/documents"
+              className="inline-flex items-center gap-1 mt-2 text-xs font-semibold text-amber-700 hover:text-amber-900 underline underline-offset-2"
+            >
+              Upload Dokumen Legalitas →
+            </Link>
+          </div>
+        </div>
+      )}
 
       {/* Global Feedback Alert */}
       {feedback.message && (

@@ -67,6 +67,13 @@ class CompanyJobController extends Controller
     {
         $company = $this->getCompany($request);
 
+        if (!$company || $company->verification_status !== 'verified') {
+            return response()->json([
+                'success' => false,
+                'message' => 'Perusahaan Anda belum terverifikasi oleh admin. Upload dokumen legalitas dan tunggu persetujuan admin sebelum dapat membuat lowongan.',
+            ], 403);
+        }
+
         $validated = $request->validate([
             'title' => ['required', 'string', 'max:150'],
             'category_id' => ['required', 'integer', 'exists:job_categories,id'],
@@ -285,6 +292,13 @@ class CompanyJobController extends Controller
             'status.required' => 'Status wajib dipilih.',
             'status.in' => 'Status hanya boleh draft, active, atau closed.',
         ]);
+
+        if ($validated['status'] === 'active' && $company->verification_status !== 'verified') {
+            return response()->json([
+                'success' => false,
+                'message' => 'Perusahaan belum terverifikasi. Lowongan tidak dapat diaktifkan sebelum admin menyetujui perusahaan Anda.',
+            ], 403);
+        }
 
         $job->update(['status' => $validated['status']]);
 
