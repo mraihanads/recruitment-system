@@ -26,6 +26,18 @@ class CompanyDocument extends Model
         ];
     }
 
+    protected $appends = ['document_url'];
+
+    public function getDocumentUrlAttribute(): ?string
+    {
+        if (!$this->document_file) return null;
+        if (str_starts_with($this->document_file, 'http://') || str_starts_with($this->document_file, 'https://')) {
+            return $this->document_file;
+        }
+        $clean = ltrim(preg_replace('/^public\//', '', $this->document_file), '/');
+        return "http://127.0.0.1:8000/storage/{$clean}";
+    }
+
     public function company(): BelongsTo
     {
         return $this->belongsTo(Company::class, 'company_id');

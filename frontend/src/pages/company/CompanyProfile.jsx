@@ -247,16 +247,16 @@ const CompanyProfile = () => {
 
     setDocUploading(true);
     try {
-      const uploadedDocs = [];
-      for (const item of docsToUpload) {
-        const payload = new FormData();
-        payload.append('document_type', item.type);
-        payload.append('document_file', item.file);
-        const res = await companyService.uploadDocument(payload);
-        if (res?.data) {
-          uploadedDocs.push(res.data);
-        }
-      }
+      const responses = await Promise.all(
+        docsToUpload.map((item) => {
+          const payload = new FormData();
+          payload.append('document_type', item.type);
+          payload.append('document_file', item.file, item.file.name);
+          return companyService.uploadDocument(payload);
+        })
+      );
+
+      const uploadedDocs = responses.filter((r) => r?.data).map((r) => r.data);
 
       setDocuments((prev) => [...uploadedDocs, ...prev]);
       setShowDocModal(false);
@@ -264,6 +264,13 @@ const CompanyProfile = () => {
       setFeedback({ type: 'success', message: 'Ketiga berkas dokumen legalitas berhasil diunggah!' });
       setTimeout(() => setFeedback({ type: '', message: '' }), 4000);
     } catch (err) {
+      // Refresh list dokumen agar jika ada yang terlanjur terupload tetap sinkron
+      try {
+        const refreshRes = await companyService.getDocuments();
+        if (refreshRes?.data) setDocuments(refreshRes.data);
+      } catch (e) {
+        // ignore
+      }
       setDocError(err.response?.data?.message || 'Gagal mengunggah berkas dokumen.');
     } finally {
       setDocUploading(false);

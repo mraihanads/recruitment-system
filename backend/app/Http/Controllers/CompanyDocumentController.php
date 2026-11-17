@@ -36,13 +36,21 @@ class CompanyDocumentController extends Controller
     {
         $request->validate([
             'document_type' => ['required', 'string', 'max:100'],
-            'document_file' => ['required', 'file', 'mimes:pdf,jpg,jpeg,png', 'max:5120'],
+            'document_file' => ['required', 'file', 'max:10240'],
         ], [
             'document_type.required' => 'Jenis dokumen wajib diisi.',
             'document_file.required' => 'Berkas dokumen wajib diunggah.',
-            'document_file.mimes' => 'Format dokumen harus berupa PDF, JPG, JPEG, atau PNG.',
-            'document_file.max' => 'Ukuran berkas dokumen maksimal 5MB.',
+            'document_file.max' => 'Ukuran berkas dokumen maksimal 10MB.',
         ]);
+
+        $allowedExtensions = ['pdf', 'jpg', 'jpeg', 'png'];
+        $extension = strtolower($request->file('document_file')->getClientOriginalExtension());
+        if (!in_array($extension, $allowedExtensions)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Format dokumen harus berupa PDF, JPG, JPEG, atau PNG.',
+            ], 422);
+        }
 
         $company = $this->getCompany($request);
 

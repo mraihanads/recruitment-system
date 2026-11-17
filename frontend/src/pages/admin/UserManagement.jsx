@@ -473,13 +473,54 @@ const UserManagement = () => {
               </div>
 
               {selectedUser.role === 'company' && selectedUser.company && (
-                <div className="border border-slate-200 rounded-xl p-4 space-y-2">
-                  <h4 className="text-xs font-bold uppercase tracking-wider text-slate-500">Profil Perusahaan</h4>
-                  <p className="text-sm font-semibold text-slate-800">{selectedUser.company.company_name}</p>
-                  <p className="text-xs text-slate-600">{selectedUser.company.address || 'Alamat belum diatur'}</p>
-                  <div className="flex gap-4 text-xs text-slate-500 pt-2 border-t border-slate-100">
-                    <span>Telepon: {selectedUser.company.phone || '-'}</span>
-                    <span>Status: <strong className="text-blue-600">{selectedUser.company.verification_status}</strong></span>
+                <div className="border border-slate-200 rounded-xl p-4 space-y-3">
+                  <div>
+                    <h4 className="text-xs font-bold uppercase tracking-wider text-slate-500">Profil Perusahaan</h4>
+                    <p className="text-sm font-semibold text-slate-800 mt-1">{selectedUser.company.company_name}</p>
+                    <p className="text-xs text-slate-600">{selectedUser.company.address || 'Alamat belum diatur'}</p>
+                    <div className="flex gap-4 text-xs text-slate-500 pt-2 border-t border-slate-100 mt-2">
+                      <span>Telepon: {selectedUser.company.phone || '-'}</span>
+                      <span>Status: <strong className="text-blue-600 uppercase">{selectedUser.company.verification_status}</strong></span>
+                    </div>
+                  </div>
+
+                  {/* Dokumen Legalitas Perusahaan */}
+                  <div className="pt-2 border-t border-slate-100">
+                    <h5 className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">Dokumen Legalitas</h5>
+                    {selectedUser.company.company_documents && selectedUser.company.company_documents.length > 0 ? (
+                      <div className="space-y-2">
+                        {selectedUser.company.company_documents.map((doc) => (
+                          <div
+                            key={doc.id}
+                            className="p-2.5 rounded-lg border border-slate-200 bg-slate-50/60 flex items-center justify-between text-xs"
+                          >
+                            <div>
+                              <span className="font-semibold text-slate-800 block">{doc.document_type}</span>
+                              <span className="text-[10px] text-slate-400 capitalize">Status: {doc.verification_status}</span>
+                            </div>
+                            {(doc.document_url || doc.document_file) && (
+                              <a
+                                href={
+                                  doc.document_url ||
+                                  (doc.document_file?.startsWith('http')
+                                    ? doc.document_file
+                                    : `http://127.0.0.1:8000/storage/${doc.document_file?.replace(/^public\//, '')}`)
+                                }
+                                target="_blank"
+                                rel="noreferrer"
+                                className="px-2.5 py-1 rounded bg-blue-600 hover:bg-blue-700 text-white font-semibold text-[11px] transition"
+                              >
+                                Buka File ↗
+                              </a>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="text-xs text-slate-400 italic bg-slate-50 p-2.5 rounded-lg border border-slate-100 text-center">
+                        Belum ada dokumen legalitas yang diunggah.
+                      </p>
+                    )}
                   </div>
                 </div>
               )}

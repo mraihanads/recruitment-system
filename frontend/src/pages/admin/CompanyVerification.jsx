@@ -484,9 +484,14 @@ const CompanyVerification = () => {
                           <span className="font-bold text-slate-800 capitalize">{doc.document_type}</span>
                           <span className="block text-slate-400">Status: {doc.verification_status}</span>
                         </div>
-                        {doc.document_file && (
+                        {(doc.document_url || doc.document_file) && (
                           <a
-                            href={doc.document_file}
+                            href={
+                              doc.document_url ||
+                              (doc.document_file?.startsWith('http')
+                                ? doc.document_file
+                                : `http://127.0.0.1:8000/storage/${doc.document_file?.replace(/^public\//, '')}`)
+                            }
                             target="_blank"
                             rel="noreferrer"
                             className="px-2.5 py-1 rounded bg-blue-50 text-blue-700 font-semibold hover:bg-blue-100"

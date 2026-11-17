@@ -104,7 +104,7 @@ const AppRoutes = () => {
         <Route path="dashboard" element={<AdminDashboard />} />
         <Route path="users" element={<UserManagement />} />
         <Route path="companies" element={<CompanyVerification />} />
-        <Route path="company-documents" element={<CompanyDocuments />} />
+        <Route path="company-documents" element={<Navigate to="/admin/companies" replace />} />
         <Route path="jobs" element={<JobModeration />} />
         <Route path="categories" element={<JobCategories />} />
         <Route path="applications" element={<ApplicationMonitoring />} />
