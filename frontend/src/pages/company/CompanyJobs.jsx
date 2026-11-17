@@ -222,7 +222,7 @@ const CompanyJobs = () => {
                 : 'Silakan unggah dokumen legalitas perusahaan terlebih dahulu dan tunggu persetujuan dari admin.'}
             </p>
             <Link
-              to="/company/documents"
+              to="/company/profile#dokumen-legalitas"
               className="inline-flex items-center gap-1 mt-2 text-xs font-semibold text-amber-700 hover:text-amber-900 underline underline-offset-2"
             >
               Upload Dokumen Legalitas →

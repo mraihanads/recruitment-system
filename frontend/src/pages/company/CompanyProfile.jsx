@@ -90,12 +90,12 @@ const CompanyProfile = () => {
   const [logoPreview, setLogoPreview] = useState(null);
   const fileInputRef = useRef(null);
 
-  // Document Upload State
+  // Document Upload State (3 Dokumen Wajib)
   const [showDocModal, setShowDocModal] = useState(false);
-  const [docFormData, setDocFormData] = useState({
-    document_type: 'NIB (Nomor Induk Berusaha)',
-    custom_type: '',
-    document_file: null,
+  const [docFiles, setDocFiles] = useState({
+    nib: null,
+    npwp: null,
+    akta: null,
   });
   const [docUploading, setDocUploading] = useState(false);
   const [docError, setDocError] = useState('');
@@ -229,45 +229,42 @@ const CompanyProfile = () => {
     }
   };
 
-  // Document Upload Handlers
+  // Document Upload Handlers (Wajib 3 Dokumen)
   const handleUploadDocument = async (e) => {
     e.preventDefault();
     setDocError('');
 
-    const resolvedType =
-      docFormData.document_type === 'Lainnya'
-        ? docFormData.custom_type.trim()
-        : docFormData.document_type;
-
-    if (!resolvedType) {
-      setDocError('Jenis dokumen wajib diisi.');
-      return;
-    }
-    if (!docFormData.document_file) {
-      setDocError('Silakan pilih berkas dokumen yang akan diunggah.');
+    if (!docFiles.nib || !docFiles.npwp || !docFiles.akta) {
+      setDocError('Perusahaan wajib memilih berkas untuk ketiga dokumen: NIB, NPWP, dan Akta Pendirian.');
       return;
     }
 
-    const payload = new FormData();
-    payload.append('document_type', resolvedType);
-    payload.append('document_file', docFormData.document_file);
+    const docsToUpload = [
+      { type: 'NIB (Nomor Induk Berusaha)', file: docFiles.nib },
+      { type: 'NPWP Perusahaan', file: docFiles.npwp },
+      { type: 'Akta Pendirian Perusahaan', file: docFiles.akta },
+    ];
 
     setDocUploading(true);
     try {
-      const res = await companyService.uploadDocument(payload);
-      if (res?.data) {
-        setDocuments((prev) => [res.data, ...prev]);
+      const uploadedDocs = [];
+      for (const item of docsToUpload) {
+        const payload = new FormData();
+        payload.append('document_type', item.type);
+        payload.append('document_file', item.file);
+        const res = await companyService.uploadDocument(payload);
+        if (res?.data) {
+          uploadedDocs.push(res.data);
+        }
       }
+
+      setDocuments((prev) => [...uploadedDocs, ...prev]);
       setShowDocModal(false);
-      setDocFormData({
-        document_type: 'NIB (Nomor Induk Berusaha)',
-        custom_type: '',
-        document_file: null,
-      });
-      setFeedback({ type: 'success', message: 'Dokumen verifikasi berhasil diunggah!' });
+      setDocFiles({ nib: null, npwp: null, akta: null });
+      setFeedback({ type: 'success', message: 'Ketiga berkas dokumen legalitas berhasil diunggah!' });
       setTimeout(() => setFeedback({ type: '', message: '' }), 4000);
     } catch (err) {
-      setDocError(err.response?.data?.message || 'Gagal mengunggah dokumen.');
+      setDocError(err.response?.data?.message || 'Gagal mengunggah berkas dokumen.');
     } finally {
       setDocUploading(false);
     }
@@ -626,7 +623,7 @@ const CompanyProfile = () => {
           </div>
 
           {/* Card: Dokumen Verifikasi Perusahaan (Requirement 5) */}
-          <div className="bg-white rounded-3xl border border-slate-200/80 p-6 sm:p-7 shadow-xs">
+          <div id="dokumen-legalitas" className="bg-white rounded-3xl border border-slate-200/80 p-6 sm:p-7 shadow-xs scroll-mt-6">
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-5">
               <div>
                 <h2 className="text-base font-bold text-slate-900 flex items-center gap-2.5">
@@ -634,7 +631,7 @@ const CompanyProfile = () => {
                   Dokumen Legalitas & Verifikasi
                 </h2>
                 <p className="text-xs text-slate-500 mt-1">
-                  Unggah dokumen resmi seperti NIB, SIUP, atau Akta untuk mempercepat proses verifikasi akun.
+                  Wajib melampirkan 3 dokumen legalitas utama: <strong>NIB, NPWP, dan Akta Pendirian Perusahaan</strong>.
                 </p>
               </div>
 
@@ -804,62 +801,89 @@ const CompanyProfile = () => {
             )}
 
             <form onSubmit={handleUploadDocument} className="space-y-4">
-              <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">
-                  Jenis Dokumen <span className="text-rose-500">*</span>
-                </label>
-                <select
-                  value={docFormData.document_type}
-                  onChange={(e) =>
-                    setDocFormData((prev) => ({ ...prev, document_type: e.target.value }))
-                  }
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600"
-                >
-                  <option value="NIB (Nomor Induk Berusaha)">NIB (Nomor Induk Berusaha)</option>
-                  <option value="SIUP (Surat Izin Usaha Perdagangan)">SIUP (Surat Izin Usaha Perdagangan)</option>
-                  <option value="NPWP Perusahaan">NPWP Perusahaan</option>
-                  <option value="Akta Pendirian Perusahaan">Akta Pendirian Perusahaan</option>
-                  <option value="Tanda Daftar Perusahaan (TDP)">Tanda Daftar Perusahaan (TDP)</option>
-                  <option value="Lainnya">Dokumen Lainnya (Ketik Manual)</option>
-                </select>
+              <div className="p-3 bg-blue-50/70 border border-blue-200/60 rounded-xl text-blue-900 text-xs leading-relaxed">
+                <span className="font-bold">Ketentuan Unggah:</span> Perusahaan diwajibkan melampirkan <strong>3 dokumen legalitas utama</strong> (NIB, NPWP, dan Akta Pendirian). Tombol unggah akan aktif setelah ketiga berkas telah dipilih.
               </div>
 
-              {docFormData.document_type === 'Lainnya' && (
-                <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">
-                    Nama Dokumen Kustom <span className="text-rose-500">*</span>
+              {/* Dokumen 1: NIB */}
+              <div className="p-3.5 rounded-xl border border-slate-200 bg-slate-50/50 space-y-1.5">
+                <div className="flex items-center justify-between">
+                  <label className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+                    <span className="w-5 h-5 rounded-full bg-blue-600 text-white text-[10px] flex items-center justify-center font-black">1</span>
+                    NIB (Nomor Induk Berusaha) <span className="text-rose-500">*</span>
                   </label>
-                  <input
-                    type="text"
-                    value={docFormData.custom_type}
-                    onChange={(e) =>
-                      setDocFormData((prev) => ({ ...prev, custom_type: e.target.value }))
-                    }
-                    placeholder="Contoh: Surat Keterangan Domisili Usaha"
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600"
-                    required
-                  />
+                  {docFiles.nib ? (
+                    <span className="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
+                      ✓ Siap
+                    </span>
+                  ) : (
+                    <span className="text-[10px] text-amber-600 font-semibold">Wajib dipilih</span>
+                  )}
                 </div>
-              )}
-
-              <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">
-                  Pilih Berkas Dokumen <span className="text-rose-500">*</span>
-                </label>
                 <input
                   type="file"
                   accept=".pdf,image/png,image/jpeg,image/jpg"
                   onChange={(e) =>
-                    setDocFormData((prev) => ({
-                      ...prev,
-                      document_file: e.target.files?.[0] || null,
-                    }))
+                    setDocFiles((prev) => ({ ...prev, nib: e.target.files?.[0] || null }))
                   }
-                  className="w-full text-xs text-slate-600 file:mr-3 file:py-2 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer"
+                  className="w-full text-xs text-slate-600 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-blue-100 file:text-blue-800 hover:file:bg-blue-200 cursor-pointer"
                   required
                 />
-                <p className="text-[11px] text-slate-400 mt-1">Maksimal 5MB (PDF, JPG, PNG)</p>
               </div>
+
+              {/* Dokumen 2: NPWP */}
+              <div className="p-3.5 rounded-xl border border-slate-200 bg-slate-50/50 space-y-1.5">
+                <div className="flex items-center justify-between">
+                  <label className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+                    <span className="w-5 h-5 rounded-full bg-blue-600 text-white text-[10px] flex items-center justify-center font-black">2</span>
+                    NPWP Perusahaan <span className="text-rose-500">*</span>
+                  </label>
+                  {docFiles.npwp ? (
+                    <span className="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
+                      ✓ Siap
+                    </span>
+                  ) : (
+                    <span className="text-[10px] text-amber-600 font-semibold">Wajib dipilih</span>
+                  )}
+                </div>
+                <input
+                  type="file"
+                  accept=".pdf,image/png,image/jpeg,image/jpg"
+                  onChange={(e) =>
+                    setDocFiles((prev) => ({ ...prev, npwp: e.target.files?.[0] || null }))
+                  }
+                  className="w-full text-xs text-slate-600 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-blue-100 file:text-blue-800 hover:file:bg-blue-200 cursor-pointer"
+                  required
+                />
+              </div>
+
+              {/* Dokumen 3: Akta Pendirian */}
+              <div className="p-3.5 rounded-xl border border-slate-200 bg-slate-50/50 space-y-1.5">
+                <div className="flex items-center justify-between">
+                  <label className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+                    <span className="w-5 h-5 rounded-full bg-blue-600 text-white text-[10px] flex items-center justify-center font-black">3</span>
+                    Akta Pendirian Perusahaan & SK Kemenkumham <span className="text-rose-500">*</span>
+                  </label>
+                  {docFiles.akta ? (
+                    <span className="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
+                      ✓ Siap
+                    </span>
+                  ) : (
+                    <span className="text-[10px] text-amber-600 font-semibold">Wajib dipilih</span>
+                  )}
+                </div>
+                <input
+                  type="file"
+                  accept=".pdf,image/png,image/jpeg,image/jpg"
+                  onChange={(e) =>
+                    setDocFiles((prev) => ({ ...prev, akta: e.target.files?.[0] || null }))
+                  }
+                  className="w-full text-xs text-slate-600 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-blue-100 file:text-blue-800 hover:file:bg-blue-200 cursor-pointer"
+                  required
+                />
+              </div>
+
+              <p className="text-[11px] text-slate-400">Format yang diterima: PDF, JPG, PNG (maksimal 5MB per berkas).</p>
 
               <div className="flex items-center justify-end gap-2 pt-3 border-t border-slate-100">
                 <button
@@ -875,10 +899,18 @@ const CompanyProfile = () => {
                 </button>
                 <button
                   type="submit"
-                  disabled={docUploading}
-                  className="px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition-all shadow-xs disabled:opacity-50 inline-flex items-center gap-1.5"
+                  disabled={docUploading || !docFiles.nib || !docFiles.npwp || !docFiles.akta}
+                  title={
+                    !docFiles.nib || !docFiles.npwp || !docFiles.akta
+                      ? 'Lengkapi pemilihan ketiga dokumen wajib terlebih dahulu'
+                      : 'Unggah ketiga dokumen'
+                  }
+                  className="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition-all shadow-xs disabled:opacity-40 disabled:cursor-not-allowed inline-flex items-center gap-1.5"
                 >
-                  {docUploading ? 'Mengunggah...' : 'Unggah Dokumen'}
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                  </svg>
+                  {docUploading ? 'Mengunggah 3 Dokumen...' : 'Unggah 3 Dokumen Sekaligus'}
                 </button>
               </div>
             </form>
