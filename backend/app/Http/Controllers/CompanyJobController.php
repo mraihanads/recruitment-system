@@ -74,6 +74,15 @@ class CompanyJobController extends Controller
             ], 403);
         }
 
+        // Ensure schedule columns exist on job_vacancies table dynamically
+        if (!\Illuminate\Support\Facades\Schema::hasColumn('job_vacancies', 'interview_start_date')) {
+            \Illuminate\Support\Facades\Schema::table('job_vacancies', function (\Illuminate\Database\Schema\Blueprint $table) {
+                $table->date('interview_start_date')->nullable()->after('deadline');
+                $table->date('interview_end_date')->nullable()->after('interview_start_date');
+                $table->date('announcement_date')->nullable()->after('interview_end_date');
+            });
+        }
+
         $validated = $request->validate([
             'title' => ['required', 'string', 'max:150'],
             'category_id' => ['required', 'integer', 'exists:job_categories,id'],
@@ -85,6 +94,9 @@ class CompanyJobController extends Controller
             'salary_max' => ['nullable', 'numeric', 'gte:salary_min'],
             'education' => ['nullable', 'string', 'max:100'],
             'deadline' => ['required', 'date'],
+            'interview_start_date' => ['nullable', 'date'],
+            'interview_end_date' => ['nullable', 'date', 'after_or_equal:interview_start_date'],
+            'announcement_date' => ['nullable', 'date'],
             'status' => ['nullable', Rule::in(['draft', 'active', 'closed'])],
             'skills' => ['nullable', 'array'],
             'skills.*' => ['integer', 'exists:skills,id'],
@@ -98,6 +110,7 @@ class CompanyJobController extends Controller
             'employment_type.required' => 'Tipe pekerjaan wajib dipilih.',
             'salary_max.gte' => 'Gaji maksimal tidak boleh lebih kecil dari gaji minimal.',
             'deadline.required' => 'Batas waktu lamaran (deadline) wajib diisi.',
+            'interview_end_date.after_or_equal' => 'Tanggal selesai wawancara tidak boleh sebelum tanggal mulai wawancara.',
         ]);
 
         return DB::transaction(function () use ($company, $validated) {
@@ -112,6 +125,9 @@ class CompanyJobController extends Controller
                 'salary_max' => $validated['salary_max'] ?? null,
                 'education' => $validated['education'] ?? null,
                 'deadline' => $validated['deadline'],
+                'interview_start_date' => $validated['interview_start_date'] ?? null,
+                'interview_end_date' => $validated['interview_end_date'] ?? null,
+                'announcement_date' => $validated['announcement_date'] ?? null,
                 'status' => $validated['status'] ?? 'draft',
             ]);
 
@@ -181,6 +197,14 @@ class CompanyJobController extends Controller
             ], 403);
         }
 
+        if (!\Illuminate\Support\Facades\Schema::hasColumn('job_vacancies', 'interview_start_date')) {
+            \Illuminate\Support\Facades\Schema::table('job_vacancies', function (\Illuminate\Database\Schema\Blueprint $table) {
+                $table->date('interview_start_date')->nullable()->after('deadline');
+                $table->date('interview_end_date')->nullable()->after('interview_start_date');
+                $table->date('announcement_date')->nullable()->after('interview_end_date');
+            });
+        }
+
         $validated = $request->validate([
             'title' => ['required', 'string', 'max:150'],
             'category_id' => ['required', 'integer', 'exists:job_categories,id'],
@@ -192,11 +216,15 @@ class CompanyJobController extends Controller
             'salary_max' => ['nullable', 'numeric', 'gte:salary_min'],
             'education' => ['nullable', 'string', 'max:100'],
             'deadline' => ['required', 'date'],
+            'interview_start_date' => ['nullable', 'date'],
+            'interview_end_date' => ['nullable', 'date', 'after_or_equal:interview_start_date'],
+            'announcement_date' => ['nullable', 'date'],
             'status' => ['nullable', Rule::in(['draft', 'active', 'closed'])],
             'skills' => ['nullable', 'array'],
             'skills.*' => ['integer', 'exists:skills,id'],
         ], [
             'salary_max.gte' => 'Gaji maksimal tidak boleh lebih kecil dari gaji minimal.',
+            'interview_end_date.after_or_equal' => 'Tanggal selesai wawancara tidak boleh sebelum tanggal mulai wawancara.',
         ]);
 
         return DB::transaction(function () use ($job, $validated) {
@@ -211,6 +239,9 @@ class CompanyJobController extends Controller
                 'salary_max' => $validated['salary_max'] ?? null,
                 'education' => $validated['education'] ?? null,
                 'deadline' => $validated['deadline'],
+                'interview_start_date' => $validated['interview_start_date'] ?? null,
+                'interview_end_date' => $validated['interview_end_date'] ?? null,
+                'announcement_date' => $validated['announcement_date'] ?? null,
                 'status' => $validated['status'] ?? $job->status,
             ]);
 

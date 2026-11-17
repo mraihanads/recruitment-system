@@ -236,9 +236,17 @@ const UserManagement = () => {
                     <tr key={u.id} className="hover:bg-slate-50/60 transition">
                       <td className="py-4 px-4 sm:px-6">
                         <div className="flex items-center gap-3">
-                          <div className="w-9 h-9 rounded-full bg-blue-100 text-blue-700 font-bold text-sm flex items-center justify-center shrink-0">
-                            {u.name?.charAt(0)?.toUpperCase() || 'U'}
-                          </div>
+                          {u.role === 'company' && u.company?.logo ? (
+                            <img
+                              src={u.company.logo}
+                              alt={u.name}
+                              className="w-9 h-9 rounded-full object-cover border border-slate-200 shrink-0"
+                            />
+                          ) : (
+                            <div className="w-9 h-9 rounded-full bg-blue-100 text-blue-700 font-bold text-sm flex items-center justify-center shrink-0">
+                              {u.name?.charAt(0)?.toUpperCase() || 'U'}
+                            </div>
+                          )}
                           <div>
                             <div className="font-semibold text-slate-900 flex items-center gap-1.5">
                               {u.name}
@@ -431,9 +439,17 @@ const UserManagement = () => {
           <div className="bg-white rounded-2xl max-w-lg w-full p-6 shadow-xl border border-slate-200 animate-in fade-in zoom-in-95 duration-150 max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between border-b border-slate-100 pb-4 mb-4">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-blue-100 text-blue-700 font-bold text-base flex items-center justify-center">
-                  {selectedUser.name?.charAt(0)?.toUpperCase()}
-                </div>
+                {selectedUser.role === 'company' && selectedUser.company?.logo ? (
+                  <img
+                    src={selectedUser.company.logo}
+                    alt={selectedUser.name}
+                    className="w-10 h-10 rounded-full object-cover border border-slate-200 shrink-0"
+                  />
+                ) : (
+                  <div className="w-10 h-10 rounded-full bg-blue-100 text-blue-700 font-bold text-base flex items-center justify-center shrink-0">
+                    {selectedUser.name?.charAt(0)?.toUpperCase()}
+                  </div>
+                )}
                 <div>
                   <h3 className="text-base font-bold text-slate-900">{selectedUser.name}</h3>
                   <p className="text-xs text-slate-400">{selectedUser.email}</p>

@@ -24,6 +24,9 @@ class JobVacancy extends Model
         'salary_max',
         'education',
         'deadline',
+        'interview_start_date',
+        'interview_end_date',
+        'announcement_date',
         'status',
     ];
 
@@ -31,6 +34,9 @@ class JobVacancy extends Model
     {
         return [
             'deadline' => 'date',
+            'interview_start_date' => 'date',
+            'interview_end_date' => 'date',
+            'announcement_date' => 'date',
             'salary_min' => 'decimal:2',
             'salary_max' => 'decimal:2',
         ];

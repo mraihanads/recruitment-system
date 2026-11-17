@@ -21,8 +21,11 @@ const CreateJob = () => {
     employment_type: 'full_time',
     salary_min: '',
     salary_max: '',
-    education: 'D3/S1 Teknik Informatika atau bidang terkait',
+    education: 'S1/D4',
     deadline: '',
+    interview_start_date: '',
+    interview_end_date: '',
+    announcement_date: '',
     status: 'active',
     skills: [],
   });
@@ -83,6 +86,12 @@ const CreateJob = () => {
       }
     }
 
+    if (formData.interview_start_date && formData.interview_end_date) {
+      if (formData.interview_end_date < formData.interview_start_date) {
+        errors.interview_end_date = ['Tanggal selesai wawancara tidak boleh sebelum tanggal mulai wawancara.'];
+      }
+    }
+
     if (formData.skills.length === 0) {
       errors.skills = ['Pilih minimal 1 keahlian (skill) yang dibutuhkan untuk lowongan ini.'];
     }
@@ -115,6 +124,9 @@ const CreateJob = () => {
         salary_max: formData.salary_max ? Number(formData.salary_max) : null,
         education: formData.education.trim() || null,
         deadline: formData.deadline,
+        interview_start_date: formData.interview_start_date || null,
+        interview_end_date: formData.interview_end_date || null,
+        announcement_date: formData.announcement_date || null,
         status: formData.status,
         skills: formData.skills,
       };
@@ -351,16 +363,21 @@ const CreateJob = () => {
 
               <div>
                 <label className="block text-xs font-bold text-slate-700 mb-1">
-                  Pendidikan Minimal
+                  Pendidikan Minimal <span className="text-rose-500">*</span>
                 </label>
-                <input
-                  type="text"
+                <select
                   name="education"
                   value={formData.education}
                   onChange={handleInputChange}
-                  placeholder="Contoh: D3/S1 Teknik Informatika"
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600"
-                />
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 bg-white"
+                  required
+                >
+                  <option value="SMA/SMK">SMA / SMK Sederajat</option>
+                  <option value="D3">D3 (Diploma)</option>
+                  <option value="S1/D4">S1 / D4 (Sarjana)</option>
+                  <option value="S2">S2 (Magister)</option>
+                  <option value="S3">S3 (Doktor)</option>
+                </select>
               </div>
             </div>
 
@@ -420,6 +437,52 @@ const CreateJob = () => {
                 )}
               </div>
 
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">
+                  Tanggal Pengumuman Hasil
+                </label>
+                <input
+                  type="date"
+                  name="announcement_date"
+                  value={formData.announcement_date}
+                  onChange={handleInputChange}
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 bg-white"
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">
+                  Jadwal Wawancara (Mulai Tanggal)
+                </label>
+                <input
+                  type="date"
+                  name="interview_start_date"
+                  value={formData.interview_start_date}
+                  onChange={handleInputChange}
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 bg-white"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">
+                  Jadwal Wawancara (Sampai Tanggal)
+                </label>
+                <input
+                  type="date"
+                  name="interview_end_date"
+                  value={formData.interview_end_date}
+                  onChange={handleInputChange}
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 bg-white"
+                />
+                {fieldErrors.interview_end_date && (
+                  <p className="text-[11px] text-rose-600 mt-1">{fieldErrors.interview_end_date[0]}</p>
+                )}
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className="block text-xs font-bold text-slate-700 mb-1">
                   Status Publikasi Awal

@@ -37,7 +37,7 @@ class CompanyProfileController extends Controller
                 'company_name' => $company->company_name,
                 'description' => $company->description,
                 'logo' => $company->logo,
-                'logo_url' => $company->logo ? Storage::disk('public')->url($company->logo) : null,
+                'logo_url' => $company->logo_url,
                 'address' => $company->address,
                 'phone' => $company->phone,
                 'website' => $company->website,
@@ -104,29 +104,38 @@ class CompanyProfileController extends Controller
     public function uploadLogo(Request $request): JsonResponse
     {
         $request->validate([
-            'logo' => ['required', 'image', 'mimes:jpg,jpeg,png', 'max:2048'],
+            'logo' => ['required', 'file', 'max:5120'],
         ], [
             'logo.required' => 'File logo perusahaan wajib diunggah.',
-            'logo.image' => 'File harus berupa gambar.',
-            'logo.mimes' => 'Format gambar harus berupa JPG, JPEG, atau PNG.',
-            'logo.max' => 'Ukuran file gambar maksimal 2MB.',
+            'logo.max' => 'Ukuran file gambar maksimal 5MB.',
         ]);
+
+        $allowedExtensions = ['jpg', 'jpeg', 'png', 'webp'];
+        $extension = strtolower($request->file('logo')->getClientOriginalExtension());
+        if (!in_array($extension, $allowedExtensions)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Format gambar harus berupa JPG, JPEG, PNG, atau WEBP.',
+            ], 422);
+        }
 
         $company = $this->getCompany($request);
 
-        if ($company->logo && Storage::disk('public')->exists($company->logo)) {
-            Storage::disk('public')->delete($company->logo);
+        $rawLogo = $company->getRawOriginal('logo');
+        if ($rawLogo && Storage::disk('public')->exists($rawLogo)) {
+            Storage::disk('public')->delete($rawLogo);
         }
 
         $path = $request->file('logo')->store('company/logos', 'public');
         $company->update(['logo' => $path]);
+        $freshCompany = $company->fresh();
 
         return response()->json([
             'success' => true,
             'message' => 'Logo perusahaan berhasil diunggah.',
             'data' => [
-                'logo' => $path,
-                'logo_url' => Storage::disk('public')->url($path),
+                'logo' => $freshCompany->logo,
+                'logo_url' => $freshCompany->logo_url,
             ],
         ]);
     }

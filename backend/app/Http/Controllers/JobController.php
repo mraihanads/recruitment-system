@@ -254,6 +254,25 @@ class JobController extends Controller
      */
     public function categories(): JsonResponse
     {
+        if (JobCategory::count() === 0) {
+            $defaultCategories = [
+                ['name' => 'Teknologi Informasi & Software', 'description' => 'Pengembangan aplikasi, jaringan, data, dan infrastruktur IT.'],
+                ['name' => 'Keuangan, Akuntansi & Perbankan', 'description' => 'Manajemen keuangan, pajak, audit, dan layanan perbankan.'],
+                ['name' => 'Pemasaran, Digital Marketing & Sales', 'description' => 'Strategi pemasaran, penjualan, media sosial, dan periklanan.'],
+                ['name' => 'Desain Kreatif & Multimedia', 'description' => 'UI/UX design, desain grafis, video editing, dan animasi.'],
+                ['name' => 'Sumber Daya Manusia (HR) & Umum', 'description' => 'Rekrutmen, pelatihan, pengembangan organisasi, dan general affair.'],
+                ['name' => 'Administrasi & Operasional', 'description' => 'Administrasi perkantoran, sekretaris, dan manajemen operasional.'],
+                ['name' => 'Teknik, Konstruksi & Manufaktur', 'description' => 'Teknik sipil, mesin, elektro, arsitektur, dan pabrikasi.'],
+                ['name' => 'Logistik, Gudang & Rantai Pasok', 'description' => 'Manajemen pergudangan, pengiriman, pengadaan, dan distribusi.'],
+                ['name' => 'Layanan Pelanggan (Customer Service)', 'description' => 'Dukungan pelanggan, call center, dan hubungan klien.'],
+                ['name' => 'Pendidikan, Riset & Pelatihan', 'description' => 'Pengajar, instruktur, peneliti, dan staf akademik.'],
+            ];
+
+            foreach ($defaultCategories as $cat) {
+                JobCategory::firstOrCreate(['name' => $cat['name']], $cat);
+            }
+        }
+
         $categories = JobCategory::orderBy('name')->get();
 
         return response()->json([

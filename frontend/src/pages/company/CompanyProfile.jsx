@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { useAuth } from '../../context/AuthContext';
 import companyService from '../../services/companyService';
 import LoadingScreen from '../../components/common/LoadingScreen';
 import ErrorState from '../../components/common/ErrorState';
@@ -67,6 +68,7 @@ const resolveMediaUrl = (path) => {
 };
 
 const CompanyProfile = () => {
+  const { refreshUser } = useAuth();
   const [profile, setProfile] = useState(null);
   const [documents, setDocuments] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -163,6 +165,7 @@ const CompanyProfile = () => {
         setProfile((prev) => ({ ...prev, ...res.data }));
         populateForm(res.data);
       }
+      await refreshUser();
       setIsEditing(false);
       setFeedback({ type: 'success', message: res?.message || 'Profil perusahaan berhasil diperbarui!' });
       setTimeout(() => setFeedback({ type: '', message: '' }), 4000);
@@ -186,12 +189,12 @@ const CompanyProfile = () => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    if (!file.type.match(/^image\/(jpeg|jpg|png)$/)) {
-      setFeedback({ type: 'error', message: 'Format file logo harus berupa JPG, JPEG, atau PNG.' });
+    if (!file.type.match(/^image\/(jpeg|jpg|png|webp)$/)) {
+      setFeedback({ type: 'error', message: 'Format file logo harus berupa JPG, JPEG, PNG, atau WEBP.' });
       return;
     }
-    if (file.size > 2 * 1024 * 1024) {
-      setFeedback({ type: 'error', message: 'Ukuran file logo maksimal 2MB.' });
+    if (file.size > 5 * 1024 * 1024) {
+      setFeedback({ type: 'error', message: 'Ukuran file logo maksimal 5MB.' });
       return;
     }
 
@@ -204,7 +207,7 @@ const CompanyProfile = () => {
     setFeedback({ type: '', message: '' });
 
     const uploadData = new FormData();
-    uploadData.append('logo', file);
+    uploadData.append('logo', file, file.name);
 
     try {
       const res = await companyService.uploadLogo(uploadData);
@@ -215,6 +218,7 @@ const CompanyProfile = () => {
           logo_url: res.data.logo_url,
         }));
       }
+      await refreshUser();
       setFeedback({ type: 'success', message: 'Logo perusahaan berhasil diperbarui!' });
       setTimeout(() => setFeedback({ type: '', message: '' }), 4000);
     } catch (err) {
@@ -710,17 +714,19 @@ const CompanyProfile = () => {
                           </a>
                         )}
 
-                        <button
-                          type="button"
-                          onClick={() => handleDeleteDocument(doc.id)}
-                          disabled={deletingDocId === doc.id}
-                          className="p-1 text-slate-400 hover:text-rose-600 transition-colors rounded-lg hover:bg-rose-50"
-                          title="Hapus Dokumen"
-                        >
-                          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                          </svg>
-                        </button>
+                        {docStatus !== 'verified' && profile?.verification_status !== 'verified' && (
+                          <button
+                            type="button"
+                            onClick={() => handleDeleteDocument(doc.id)}
+                            disabled={deletingDocId === doc.id}
+                            className="p-1 text-slate-400 hover:text-rose-600 transition-colors rounded-lg hover:bg-rose-50"
+                            title="Hapus Dokumen"
+                          >
+                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                            </svg>
+                          </button>
+                        )}
                       </div>
                     </div>
                   );

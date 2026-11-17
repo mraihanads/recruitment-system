@@ -18,6 +18,20 @@ class CandidateSkillController extends Controller
      */
     public function allSkills(): JsonResponse
     {
+        if (Skill::count() === 0) {
+            $defaultSkills = [
+                'JavaScript', 'React.js', 'PHP', 'Laravel', 'MySQL', 'Node.js', 'Python',
+                'UI/UX Design', 'Figma', 'Graphic Design', 'Digital Marketing', 'SEO',
+                'Copywriting', 'Microsoft Excel', 'Accounting', 'Financial Analysis',
+                'Project Management', 'Public Speaking', 'Customer Service', 'Data Analysis',
+                'HTML/CSS', 'Tailwind CSS', 'Git', 'Human Resources', 'Administration',
+            ];
+
+            foreach ($defaultSkills as $skillName) {
+                Skill::firstOrCreate(['name' => $skillName]);
+            }
+        }
+
         $skills = Skill::orderBy('name')->get();
 
         return response()->json([

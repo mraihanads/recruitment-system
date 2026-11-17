@@ -12,6 +12,24 @@ const Sidebar = ({ menuItems = [], roleLabel = 'Portal', isMobileOpen = false, o
     navigate('/login', { replace: true });
   };
 
+  const resolveAvatarUrl = () => {
+    if (role === 'company' && user?.company) {
+      const logo = user.company.logo_url || user.company.logo;
+      if (logo) {
+        if (logo.startsWith('http://') || logo.startsWith('https://')) return logo;
+        return `http://127.0.0.1:8000/storage/${logo.replace(/^public\//, '')}`;
+      }
+    }
+    if (role === 'candidate' && user?.candidate_profile?.photo) {
+      const photo = user.candidate_profile.photo;
+      if (photo.startsWith('http://') || photo.startsWith('https://')) return photo;
+      return `http://127.0.0.1:8000/storage/${photo.replace(/^public\//, '')}`;
+    }
+    return null;
+  };
+
+  const avatarUrl = resolveAvatarUrl();
+
   const navContent = (
     <div className="flex flex-col h-full bg-white border-r border-slate-200/80">
       {/* Brand Header */}
@@ -77,9 +95,17 @@ const Sidebar = ({ menuItems = [], roleLabel = 'Portal', isMobileOpen = false, o
       {/* Bottom User Profile Section */}
       <div className="p-4 border-t border-slate-100 bg-slate-50/50">
         <div className="flex items-center gap-3 mb-3">
-          <div className="w-9 h-9 rounded-xl bg-blue-600 text-white font-bold text-xs flex items-center justify-center shrink-0 shadow-xs">
-            {user?.name ? user.name[0].toUpperCase() : 'U'}
-          </div>
+          {avatarUrl ? (
+            <img
+              src={avatarUrl}
+              alt={user?.name || 'User'}
+              className="w-9 h-9 rounded-xl object-cover border border-slate-200 shrink-0 shadow-xs"
+            />
+          ) : (
+            <div className="w-9 h-9 rounded-xl bg-blue-600 text-white font-bold text-xs flex items-center justify-center shrink-0 shadow-xs">
+              {user?.name ? user.name[0].toUpperCase() : 'U'}
+            </div>
+          )}
           <div className="min-w-0 flex-1">
             <p className="text-xs font-bold text-slate-800 truncate">{user?.name || 'User'}</p>
             <p className="text-[11px] text-slate-400 truncate">{user?.email || ''}</p>

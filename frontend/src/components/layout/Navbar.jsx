@@ -33,6 +33,24 @@ const Navbar = ({ title = 'Dashboard', onMenuClick }) => {
       .toUpperCase();
   };
 
+  const resolveAvatarUrl = () => {
+    if (role === 'company' && user?.company) {
+      const logo = user.company.logo_url || user.company.logo;
+      if (logo) {
+        if (logo.startsWith('http://') || logo.startsWith('https://')) return logo;
+        return `http://127.0.0.1:8000/storage/${logo.replace(/^public\//, '')}`;
+      }
+    }
+    if (role === 'candidate' && user?.candidate_profile?.photo) {
+      const photo = user.candidate_profile.photo;
+      if (photo.startsWith('http://') || photo.startsWith('https://')) return photo;
+      return `http://127.0.0.1:8000/storage/${photo.replace(/^public\//, '')}`;
+    }
+    return null;
+  };
+
+  const avatarUrl = resolveAvatarUrl();
+
   return (
     <header className="sticky top-0 z-20 bg-white/95 backdrop-blur-md border-b border-slate-200/80 px-4 sm:px-6 py-3.5 flex items-center justify-between shadow-xs">
       {/* Left: Mobile Toggle & Page Title */}
@@ -68,10 +86,18 @@ const Navbar = ({ title = 'Dashboard', onMenuClick }) => {
           </span>
         </div>
 
-        {/* User Initials Avatar */}
-        <div className="w-9 h-9 rounded-xl bg-blue-600 text-white font-extrabold text-xs sm:text-sm flex items-center justify-center shadow-xs select-none">
-          {getInitials(user?.name)}
-        </div>
+        {/* User Avatar / Logo */}
+        {avatarUrl ? (
+          <img
+            src={avatarUrl}
+            alt={user?.name || 'Avatar'}
+            className="w-9 h-9 rounded-xl object-cover border border-slate-200 shadow-xs shrink-0"
+          />
+        ) : (
+          <div className="w-9 h-9 rounded-xl bg-blue-600 text-white font-extrabold text-xs sm:text-sm flex items-center justify-center shadow-xs select-none shrink-0">
+            {getInitials(user?.name)}
+          </div>
+        )}
 
         {/* Logout Button */}
         <button

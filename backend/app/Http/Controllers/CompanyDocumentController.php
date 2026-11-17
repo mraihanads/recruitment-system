@@ -136,6 +136,13 @@ class CompanyDocumentController extends Controller
             ], 403);
         }
 
+        if ($document->verification_status === 'verified' || $company->verification_status === 'verified') {
+            return response()->json([
+                'success' => false,
+                'message' => 'Dokumen yang telah terverifikasi tidak dapat dihapus.',
+            ], 403);
+        }
+
         if ($document->document_file && Storage::disk('public')->exists($document->document_file)) {
             Storage::disk('public')->delete($document->document_file);
         }

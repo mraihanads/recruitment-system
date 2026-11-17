@@ -412,6 +412,24 @@ const CompanyJobDetail = () => {
                 <span className="font-semibold text-slate-800">{job.education || '-'}</span>
               </div>
               <div className="flex justify-between">
+                <span className="text-slate-400">Batas Akhir Lamaran:</span>
+                <span className="font-semibold text-slate-800">{formatDate(job.deadline)}</span>
+              </div>
+              {(job.interview_start_date || job.interview_end_date) && (
+                <div className="flex justify-between">
+                  <span className="text-slate-400">Jadwal Wawancara:</span>
+                  <span className="font-semibold text-slate-800">
+                    {formatDate(job.interview_start_date)} s/d {formatDate(job.interview_end_date)}
+                  </span>
+                </div>
+              )}
+              {job.announcement_date && (
+                <div className="flex justify-between">
+                  <span className="text-slate-400">Tanggal Pengumuman:</span>
+                  <span className="font-semibold text-emerald-700">{formatDate(job.announcement_date)}</span>
+                </div>
+              )}
+              <div className="flex justify-between">
                 <span className="text-slate-400">Dibuat Pada:</span>
                 <span className="font-semibold text-slate-800">{formatDate(job.created_at)}</span>
               </div>

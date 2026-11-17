@@ -14,6 +14,10 @@ class AdminCategoryController extends Controller
      */
     public function index(Request $request): JsonResponse
     {
+        if (JobCategory::count() === 0) {
+            app(JobController::class)->categories();
+        }
+
         $query = JobCategory::withCount('jobVacancies');
 
         if ($request->filled('search')) {

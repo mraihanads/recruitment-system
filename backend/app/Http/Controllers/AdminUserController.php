@@ -15,8 +15,8 @@ class AdminUserController extends Controller
     public function index(Request $request): JsonResponse
     {
         $query = User::with([
-            'candidateProfile:id,user_id,full_name,phone,gender',
-            'company:id,user_id,company_name,description,address,phone,website,verification_status',
+            'candidateProfile:id,user_id,full_name,phone,gender,photo',
+            'company:id,user_id,company_name,description,logo,address,phone,website,verification_status',
             'company.companyDocuments',
         ]);
 
@@ -51,8 +51,8 @@ class AdminUserController extends Controller
     public function show(int $id): JsonResponse
     {
         $user = User::with([
-            'candidateProfile:id,user_id,full_name,phone,gender,birth_date,address',
-            'company:id,user_id,company_name,description,address,phone,website,verification_status',
+            'candidateProfile:id,user_id,full_name,phone,gender,birth_date,address,photo',
+            'company:id,user_id,company_name,description,logo,address,phone,website,verification_status',
             'company.companyDocuments',
         ])->find($id);
 

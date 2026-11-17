@@ -110,17 +110,25 @@ class AuthController extends Controller
 
         $token = $user->createToken('auth_token')->plainTextToken;
 
+        $userData = [
+            'id' => $user->id,
+            'name' => $user->name,
+            'email' => $user->email,
+            'role' => $user->role,
+            'status' => $user->status,
+        ];
+
+        if ($user->role === 'candidate') {
+            $userData['candidate_profile'] = $user->candidateProfile;
+        } elseif ($user->role === 'company') {
+            $userData['company'] = $user->company;
+        }
+
         return response()->json([
             'success' => true,
             'message' => 'Login berhasil.',
             'data' => [
-                'user' => [
-                    'id' => $user->id,
-                    'name' => $user->name,
-                    'email' => $user->email,
-                    'role' => $user->role,
-                    'status' => $user->status,
-                ],
+                'user' => $userData,
                 'token' => $token,
             ],
         ]);

@@ -22,6 +22,23 @@ class Company extends Model
         'verification_status',
     ];
 
+    protected $appends = ['logo_url'];
+
+    public function getLogoAttribute($value): ?string
+    {
+        if (!$value) return null;
+        if (str_starts_with($value, 'http://') || str_starts_with($value, 'https://')) {
+            return $value;
+        }
+        $clean = ltrim(preg_replace('/^public\//', '', $value), '/');
+        return "http://127.0.0.1:8000/storage/{$clean}";
+    }
+
+    public function getLogoUrlAttribute(): ?string
+    {
+        return $this->logo;
+    }
+
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);

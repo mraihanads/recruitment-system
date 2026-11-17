@@ -281,7 +281,23 @@ const JobDetail = () => {
                     <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                     </svg>
-                    <span>Batas: {formatDate(jobData.deadline)}</span>
+                    <span>Batas Lamaran: {formatDate(jobData.deadline)}</span>
+                  </div>
+                )}
+                {(jobData.interview_start_date || jobData.interview_end_date) && (
+                  <div className="flex items-center gap-1.5 text-blue-600 font-medium">
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                    <span>Wawancara: {formatDate(jobData.interview_start_date)} - {formatDate(jobData.interview_end_date)}</span>
+                  </div>
+                )}
+                {jobData.announcement_date && (
+                  <div className="flex items-center gap-1.5 text-emerald-600 font-medium">
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <span>Pengumuman: {formatDate(jobData.announcement_date)}</span>
                   </div>
                 )}
               </div>
