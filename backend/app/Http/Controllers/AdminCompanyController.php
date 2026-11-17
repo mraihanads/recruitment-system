@@ -25,6 +25,8 @@ class AdminCompanyController extends Controller
 
         if ($request->filled('verification_status')) {
             $query->where('verification_status', $request->query('verification_status'));
+        } else {
+            $query->where('verification_status', 'pending');
         }
 
         $perPage = (int) $request->query('per_page', 10);

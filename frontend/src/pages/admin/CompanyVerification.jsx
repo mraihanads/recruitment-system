@@ -10,7 +10,6 @@ const CompanyVerification = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [search, setSearch] = useState('');
-  const [statusFilter, setStatusFilter] = useState('');
   const [page, setPage] = useState(1);
 
   // Modals
@@ -28,9 +27,9 @@ const CompanyVerification = () => {
       const params = {
         page,
         per_page: 10,
+        verification_status: 'pending',
       };
       if (search.trim()) params.search = search.trim();
-      if (statusFilter) params.verification_status = statusFilter;
 
       const res = await adminService.getCompanies(params);
       if (res?.success) {
@@ -46,7 +45,7 @@ const CompanyVerification = () => {
     } finally {
       setLoading(false);
     }
-  }, [page, search, statusFilter]);
+  }, [page, search]);
 
   useEffect(() => {
     fetchCompanies();
@@ -181,30 +180,15 @@ const CompanyVerification = () => {
         </div>
 
         <div className="flex flex-wrap items-center gap-3 w-full md:w-auto">
-          <select
-            value={statusFilter}
-            onChange={(e) => {
-              setStatusFilter(e.target.value);
-              setPage(1);
-            }}
-            className="px-3 py-2 text-sm rounded-xl border border-slate-200 bg-white text-slate-700 focus:outline-hidden focus:border-blue-500"
-          >
-            <option value="">Semua Status</option>
-            <option value="pending">Pending</option>
-            <option value="verified">Verified</option>
-            <option value="rejected">Rejected</option>
-          </select>
-
-          {(search || statusFilter) && (
+          {search && (
             <button
               onClick={() => {
                 setSearch('');
-                setStatusFilter('');
                 setPage(1);
               }}
               className="px-3 py-2 text-xs font-semibold text-rose-600 bg-rose-50 hover:bg-rose-100 rounded-xl transition"
             >
-              Reset Filter
+              Reset Pencarian
             </button>
           )}
         </div>
@@ -223,8 +207,8 @@ const CompanyVerification = () => {
         ) : companies.length === 0 ? (
           <div className="p-8">
             <EmptyState
-              title="Perusahaan Tidak Ditemukan"
-              message="Belum ada data perusahaan yang cocok dengan kriteria filter."
+              title="Tidak Ada Antrean Verifikasi"
+              message="Seluruh perusahaan yang mendaftar telah diproses (diterima atau ditolak). Data perusahaan dapat dilihat di menu Kelola Pengguna."
             />
           </div>
         ) : (
