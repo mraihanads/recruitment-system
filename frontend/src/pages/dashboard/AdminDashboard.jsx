@@ -80,21 +80,17 @@ const AdminDashboard = () => {
 
   return (
     <div className="space-y-6">
-      {/* Welcome Banner */}
-      <div className="bg-gradient-to-r from-blue-700 via-indigo-700 to-blue-800 rounded-2xl p-6 sm:p-8 text-white shadow-md relative overflow-hidden">
-        <div className="relative z-10">
-          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-white/20 backdrop-blur-xs text-white border border-white/25 mb-3">
-            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-            Administrator Control Center
-          </span>
-          <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
-            Selamat Datang, {user?.name || 'Administrator'}!
-          </h2>
-          <p className="text-blue-100 text-sm sm:text-base mt-2 max-w-2xl leading-relaxed">
-            Pantau dan kelola seluruh ekosistem rekrutmen: pengguna, perusahaan, dokumen verifikasi, lowongan, kategori, dan monitoring lamaran secara real-time.
-          </p>
-        </div>
-        <div className="absolute -right-8 -bottom-10 w-48 h-48 rounded-full bg-white/5 pointer-events-none"></div>
+      {/* Clean Editorial Welcome Card */}
+      <div className="bg-white rounded-xl border border-slate-200/90 p-6 sm:p-7">
+        <span className="text-xs font-mono uppercase tracking-wider text-blue-700 font-semibold block mb-1.5">
+          Administrator Control Center
+        </span>
+        <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">
+          Selamat Datang, {user?.name || 'Administrator'}!
+        </h2>
+        <p className="text-slate-500 text-xs sm:text-sm mt-1.5 max-w-2xl leading-relaxed">
+          Pantau dan kelola seluruh ekosistem rekrutmen: pengguna, perusahaan, dokumen verifikasi, lowongan, kategori, dan monitoring lamaran secara real-time.
+        </p>
       </div>
 
       {/* 8 Primary Real-time Stat Cards */}

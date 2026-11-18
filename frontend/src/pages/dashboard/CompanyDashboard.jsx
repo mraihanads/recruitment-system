@@ -58,45 +58,39 @@ const CompanyDashboard = () => {
 
   return (
     <div className="space-y-6">
-      {/* Welcome Banner */}
-      <div className="bg-gradient-to-r from-emerald-700 via-teal-700 to-emerald-800 rounded-2xl p-6 sm:p-8 text-white shadow-md relative overflow-hidden">
-        <div className="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div>
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-white/20 backdrop-blur-xs text-white border border-white/25 mb-3">
-              <span className="w-2 h-2 rounded-full bg-emerald-300 animate-pulse"></span>
-              Company Recruiter Portal
-            </span>
-            <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
-              Selamat Datang, {user?.name || 'Recruiter'}!
-            </h2>
-            <p className="text-emerald-100 text-sm sm:text-base mt-2 max-w-xl leading-relaxed">
-              Kelola pembukaan lowongan kerja, review kandidat yang melamar, dan atur jadwal wawancara secara terintegrasi.
-            </p>
-          </div>
-          <div className="flex flex-wrap items-center gap-2.5 self-start sm:self-center shrink-0">
-            <Link
-              to="/company/reports"
-              className="px-4 py-2.5 bg-white/20 hover:bg-white/30 backdrop-blur-xs text-white border border-white/30 font-bold text-sm rounded-xl transition-all inline-flex items-center gap-1.5"
-              data-testid="view-reports-dashboard-btn"
-            >
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-              </svg>
-              Lihat Laporan
-            </Link>
-            <Link
-              to="/company/jobs"
-              className="px-5 py-2.5 bg-white text-emerald-800 font-bold text-sm rounded-xl hover:bg-emerald-50 shadow-md transition-all shrink-0"
-            >
-              + Buat Lowongan
-            </Link>
-          </div>
+      {/* Clean Editorial Welcome Card (Aligned with Candidate Dashboard & Homepage) */}
+      <div className="bg-white rounded-xl border border-slate-200/90 p-6 sm:p-7 flex flex-col sm:flex-row sm:items-center justify-between gap-5">
+        <div>
+          <span className="text-xs font-mono uppercase tracking-wider text-blue-700 font-semibold block mb-1.5">
+            Company Recruiter Portal
+          </span>
+          <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">
+            Selamat Datang, {user?.name || 'Recruiter'}!
+          </h2>
+          <p className="text-slate-500 text-xs sm:text-sm mt-1.5 max-w-xl leading-relaxed">
+            Kelola pembukaan lowongan kerja, review kandidat yang melamar, dan atur jadwal wawancara secara terintegrasi.
+          </p>
         </div>
-        <div className="absolute -right-8 -bottom-10 w-48 h-48 rounded-full bg-white/5 pointer-events-none"></div>
+
+        <div className="flex flex-wrap items-center gap-2.5 shrink-0">
+          <Link
+            to="/company/reports"
+            className="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs rounded-lg border border-slate-200/80 transition-colors inline-flex items-center gap-1.5"
+            data-testid="view-reports-dashboard-btn"
+          >
+            <span>Lihat Laporan</span>
+          </Link>
+          <Link
+            to="/company/jobs"
+            className="inline-flex items-center gap-2 px-5 py-2.5 bg-slate-900 hover:bg-blue-700 text-white font-semibold text-xs rounded-lg transition-colors"
+          >
+            <span>+ Buat Lowongan</span>
+          </Link>
+        </div>
       </div>
 
       {/* Main StatCards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
         <StatCard
           title="Total Lowongan"
           value={stats?.total_jobs || 0}
@@ -104,8 +98,8 @@ const CompanyDashboard = () => {
           color="emerald"
           badge={`${stats?.active_jobs || 0} Aktif`}
           icon={
-            <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
             </svg>
           }
         />
@@ -117,8 +111,8 @@ const CompanyDashboard = () => {
           color="blue"
           badge={stats?.pending_applications > 0 ? `${stats?.pending_applications} Perlu Review` : 'Up-to-date'}
           icon={
-            <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
             </svg>
           }
         />
@@ -129,8 +123,8 @@ const CompanyDashboard = () => {
           subtitle="Kandidat pada tahap wawancara"
           color="purple"
           icon={
-            <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
             </svg>
           }
         />
@@ -141,8 +135,8 @@ const CompanyDashboard = () => {
           subtitle={`${stats?.rejected_count || 0} Lamaran Ditolak`}
           color="amber"
           icon={
-            <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
           }
         />
@@ -150,20 +144,20 @@ const CompanyDashboard = () => {
 
       {/* Application Status Funnel Bar */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-        <div className="bg-white p-4 rounded-xl border border-slate-200/80">
-          <span className="text-xs font-semibold text-slate-400 block mb-1">Menunggu Review</span>
+        <div className="bg-white p-4 rounded-xl border border-slate-200/90">
+          <span className="text-xs font-medium text-slate-500 block mb-1">Menunggu Review</span>
           <span className="text-xl font-bold text-amber-600">{stats?.pending_applications || 0}</span>
         </div>
-        <div className="bg-white p-4 rounded-xl border border-slate-200/80">
-          <span className="text-xs font-semibold text-slate-400 block mb-1">Tahap Wawancara</span>
-          <span className="text-xl font-bold text-purple-600">{stats?.interview_count || 0}</span>
+        <div className="bg-white p-4 rounded-xl border border-slate-200/90">
+          <span className="text-xs font-medium text-slate-500 block mb-1">Tahap Wawancara</span>
+          <span className="text-xl font-bold text-blue-600">{stats?.interview_count || 0}</span>
         </div>
-        <div className="bg-white p-4 rounded-xl border border-slate-200/80">
-          <span className="text-xs font-semibold text-slate-400 block mb-1">Resmi Diterima</span>
+        <div className="bg-white p-4 rounded-xl border border-slate-200/90">
+          <span className="text-xs font-medium text-slate-500 block mb-1">Resmi Diterima</span>
           <span className="text-xl font-bold text-emerald-600">{stats?.accepted_count || 0}</span>
         </div>
-        <div className="bg-white p-4 rounded-xl border border-slate-200/80">
-          <span className="text-xs font-semibold text-slate-400 block mb-1">Tidak Lolos</span>
+        <div className="bg-white p-4 rounded-xl border border-slate-200/90">
+          <span className="text-xs font-medium text-slate-500 block mb-1">Tidak Lolos</span>
           <span className="text-xl font-bold text-rose-600">{stats?.rejected_count || 0}</span>
         </div>
       </div>
@@ -175,13 +169,13 @@ const CompanyDashboard = () => {
           title="Daftar Lowongan Kerja"
           subtitle="Lowongan yang sedang aktif dibuka"
           action={
-            <Link to="/company/jobs" className="text-xs font-bold text-blue-600 hover:text-blue-700">
+            <Link to="/company/jobs" className="text-xs font-bold text-blue-700 hover:text-blue-800">
               Lihat Semua →
             </Link>
           }
         >
           {recentJobs.length > 0 ? (
-            <div className="divide-y divide-slate-100">
+            <div className="divide-y divide-slate-200/80">
               {recentJobs.map((job) => (
                 <div
                   key={job.id}
@@ -189,13 +183,13 @@ const CompanyDashboard = () => {
                 >
                   <div className="flex items-center justify-between">
                     <div className="min-w-0 pr-3">
-                      <p className="text-sm font-bold text-slate-800 truncate">{job.title}</p>
-                      <p className="text-xs text-slate-400 mt-0.5">
+                      <p className="text-sm font-bold text-slate-900 truncate">{job.title}</p>
+                      <p className="text-xs text-slate-500 mt-0.5">
                         {job.category?.name || 'Umum'} • {job.employment_type || 'Full Time'}
                       </p>
                     </div>
                     <span
-                      className={`shrink-0 text-xs font-bold px-2.5 py-1 rounded-full border ${
+                      className={`shrink-0 text-xs font-bold px-2.5 py-1 rounded-md border ${
                         job.is_removed_by_admin
                           ? 'bg-rose-50 text-rose-700 border-rose-200'
                           : job.status === 'active'
@@ -215,7 +209,7 @@ const CompanyDashboard = () => {
               ))}
             </div>
           ) : (
-            <div className="text-center py-6 text-slate-400 text-sm">
+            <div className="text-center py-6 text-slate-500 text-sm">
               Belum ada lowongan dibuat. Silakan tambahkan lowongan baru.
             </div>
           )}
@@ -226,31 +220,31 @@ const CompanyDashboard = () => {
           title="Lamaran Masuk Terbaru"
           subtitle="Kandidat yang baru melamar ke perusahaan Anda"
           action={
-            <Link to="/company/applications" className="text-xs font-bold text-blue-600 hover:text-blue-700">
+            <Link to="/company/applications" className="text-xs font-bold text-blue-700 hover:text-blue-800">
               Lihat Semua →
             </Link>
           }
         >
           {recentApps.length > 0 ? (
-            <div className="divide-y divide-slate-100">
+            <div className="divide-y divide-slate-200/80">
               {recentApps.map((app) => (
                 <div key={app.id} className="py-3 flex items-center justify-between first:pt-0 last:pb-0">
                   <div className="min-w-0 pr-3">
-                    <p className="text-sm font-bold text-slate-800 truncate">
+                    <p className="text-sm font-bold text-slate-900 truncate">
                       {app.candidate_profile?.full_name || 'Pelamar'}
                     </p>
-                    <p className="text-xs text-slate-400 mt-0.5 truncate">
+                    <p className="text-xs text-slate-500 mt-0.5 truncate">
                       Lowongan: {app.job_vacancy?.title || 'Posisi'}
                     </p>
                   </div>
-                  <span className="shrink-0 text-xs font-bold bg-blue-50 text-blue-700 border border-blue-200 px-2.5 py-1 rounded-full uppercase">
+                  <span className="shrink-0 text-xs font-bold bg-blue-50 text-blue-700 border border-blue-200 px-2.5 py-1 rounded-md uppercase">
                     {app.status}
                   </span>
                 </div>
               ))}
             </div>
           ) : (
-            <div className="text-center py-6 text-slate-400 text-sm">
+            <div className="text-center py-6 text-slate-500 text-sm">
               Belum ada lamaran kandidat masuk saat ini.
             </div>
           )}
