@@ -37,6 +37,9 @@ class JobController extends Controller
             'skills:id,name',
         ])
         ->where('status', 'active')
+        ->where(function ($q) {
+            $q->where('is_removed_by_admin', false)->orWhereNull('is_removed_by_admin');
+        })
         ->whereDate('deadline', '>=', Carbon::today());
 
         // Filter: search keyword (title, description, or requirements)

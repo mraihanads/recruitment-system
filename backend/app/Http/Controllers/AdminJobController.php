@@ -3,22 +3,38 @@
 namespace App\Http\Controllers;
 
 use App\Models\JobVacancy;
+use App\Models\Notification;
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Validator;
 
 class AdminJobController extends Controller
 {
+    protected function ensureModerationColumns(): void
+    {
+        if (!Schema::hasColumn('job_vacancies', 'is_removed_by_admin')) {
+            Schema::table('job_vacancies', function (Blueprint $table) {
+                $table->boolean('is_removed_by_admin')->default(false)->after('status');
+                $table->text('admin_note')->nullable()->after('is_removed_by_admin');
+            });
+        }
+    }
+
     /**
      * Display a listing of all job vacancies.
      */
     public function index(Request $request): JsonResponse
     {
+        $this->ensureModerationColumns();
+
         $query = JobVacancy::with([
             'company:id,user_id,company_name,logo',
             'category:id,name',
             'skills:id,name',
-        ])->withCount('applications');
+        ])->withCount('applications')
+          ->where('is_removed_by_admin', false);
 
         if ($request->filled('search')) {
             $search = $request->query('search');
@@ -110,11 +126,13 @@ class AdminJobController extends Controller
     }
 
     /**
-     * Remove the specified job vacancy.
+     * Remove (soft-disable) the specified job vacancy with an admin note.
      */
-    public function destroy(int $id): JsonResponse
+    public function destroy(Request $request, int $id): JsonResponse
     {
-        $job = JobVacancy::find($id);
+        $this->ensureModerationColumns();
+
+        $job = JobVacancy::with('company')->find($id);
 
         if (!$job) {
             return response()->json([
@@ -123,19 +141,42 @@ class AdminJobController extends Controller
             ], 404);
         }
 
-        if ($job->applications()->exists()) {
+        $validator = Validator::make($request->all(), [
+            'admin_note' => 'required|string|min:3|max:1000',
+        ], [
+            'admin_note.required' => 'Keterangan alasan penghapusan wajib diisi.',
+            'admin_note.min' => 'Keterangan minimal 3 karakter.',
+        ]);
+
+        if ($validator->fails()) {
             return response()->json([
                 'success' => false,
-                'message' => 'Lowongan memiliki pelamar dan tidak dapat dihapus.',
+                'message' => $validator->errors()->first('admin_note') ?: 'Keterangan wajib diisi.',
+                'errors' => $validator->errors(),
             ], 422);
         }
 
-        $job->skills()->detach();
-        $job->delete();
+        $adminNote = trim($request->input('admin_note'));
+
+        $job->update([
+            'status' => 'closed',
+            'is_removed_by_admin' => true,
+            'admin_note' => $adminNote,
+        ]);
+
+        if ($job->company && $job->company->user_id) {
+            Notification::create([
+                'user_id' => $job->company->user_id,
+                'title' => 'Lowongan Dihapus oleh Admin',
+                'message' => "Lowongan \"{$job->title}\" telah dinonaktifkan/dihapus dari beranda oleh admin. Keterangan: {$adminNote}",
+                'type' => 'warning',
+                'is_read' => false,
+            ]);
+        }
 
         return response()->json([
             'success' => true,
-            'message' => 'Lowongan berhasil dihapus.',
+            'message' => 'Lowongan berhasil dihapus dari beranda dan keterangan telah dikirim ke perusahaan.',
         ]);
     }
 }

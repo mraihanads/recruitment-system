@@ -183,22 +183,34 @@ const CompanyDashboard = () => {
           {recentJobs.length > 0 ? (
             <div className="divide-y divide-slate-100">
               {recentJobs.map((job) => (
-                <div key={job.id} className="py-3 flex items-center justify-between first:pt-0 last:pb-0">
-                  <div className="min-w-0 pr-3">
-                    <p className="text-sm font-bold text-slate-800 truncate">{job.title}</p>
-                    <p className="text-xs text-slate-400 mt-0.5">
-                      {job.category?.name || 'Umum'} • {job.employment_type || 'Full Time'}
-                    </p>
+                <div
+                  key={job.id}
+                  className={`py-3 first:pt-0 last:pb-0 ${job.is_removed_by_admin ? 'opacity-75' : ''}`}
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="min-w-0 pr-3">
+                      <p className="text-sm font-bold text-slate-800 truncate">{job.title}</p>
+                      <p className="text-xs text-slate-400 mt-0.5">
+                        {job.category?.name || 'Umum'} • {job.employment_type || 'Full Time'}
+                      </p>
+                    </div>
+                    <span
+                      className={`shrink-0 text-xs font-bold px-2.5 py-1 rounded-full border ${
+                        job.is_removed_by_admin
+                          ? 'bg-rose-50 text-rose-700 border-rose-200'
+                          : job.status === 'active'
+                          ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                          : 'bg-slate-100 text-slate-600 border-slate-200'
+                      }`}
+                    >
+                      {job.is_removed_by_admin ? 'Dihapus Admin' : job.status === 'active' ? 'Aktif' : job.status}
+                    </span>
                   </div>
-                  <span
-                    className={`shrink-0 text-xs font-bold px-2.5 py-1 rounded-full border ${
-                      job.status === 'active'
-                        ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
-                        : 'bg-slate-100 text-slate-600 border-slate-200'
-                    }`}
-                  >
-                    {job.status === 'active' ? 'Aktif' : job.status}
-                  </span>
+                  {job.is_removed_by_admin && job.admin_note && (
+                    <div className="mt-2 rounded-xl bg-rose-50 border border-rose-200 px-3 py-2 text-[11px] text-rose-700">
+                      <span className="font-bold">Keterangan Admin:</span> {job.admin_note}
+                    </div>
+                  )}
                 </div>
               ))}
             </div>

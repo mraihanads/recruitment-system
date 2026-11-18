@@ -66,8 +66,8 @@ const adminService = {
     const response = await api.patch(`/admin/jobs/${id}/status`, { status });
     return response.data;
   },
-  deleteJob: async (id) => {
-    const response = await api.delete(`/admin/jobs/${id}`);
+  deleteJob: async (id, admin_note) => {
+    const response = await api.delete(`/admin/jobs/${id}`, { data: { admin_note } });
     return response.data;
   },
 

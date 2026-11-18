@@ -168,6 +168,13 @@ class CompanyJobController extends Controller
             ], 403);
         }
 
+        if ($job->is_removed_by_admin) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Lowongan ini telah dihapus/dinonaktifkan oleh admin dan tidak dapat diubah.',
+            ], 403);
+        }
+
         return response()->json([
             'success' => true,
             'message' => 'Detail lowongan kerja berhasil diambil.',
@@ -194,6 +201,13 @@ class CompanyJobController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Anda tidak memiliki akses ke lowongan kerja ini.',
+            ], 403);
+        }
+
+        if ($job->is_removed_by_admin) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Lowongan ini telah dihapus/dinonaktifkan oleh admin dan tidak dapat diubah.',
             ], 403);
         }
 
@@ -279,6 +293,13 @@ class CompanyJobController extends Controller
             ], 403);
         }
 
+        if ($job->is_removed_by_admin) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Lowongan ini telah dihapus/dinonaktifkan oleh admin dan tidak dapat diubah.',
+            ], 403);
+        }
+
         // Business rule: Do not delete if applications already exist
         if ($job->applications()->exists()) {
             return response()->json([
@@ -314,6 +335,13 @@ class CompanyJobController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Anda tidak memiliki akses ke lowongan kerja ini.',
+            ], 403);
+        }
+
+        if ($job->is_removed_by_admin) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Lowongan ini telah dihapus/dinonaktifkan oleh admin dan tidak dapat diubah.',
             ], 403);
         }
 

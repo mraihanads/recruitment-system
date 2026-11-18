@@ -18,6 +18,7 @@ const JobModeration = () => {
   const [detailModalOpen, setDetailModalOpen] = useState(false);
   const [actionModalOpen, setActionModalOpen] = useState(false);
   const [actionType, setActionType] = useState(''); // 'active', 'closed', 'delete'
+  const [adminNote, setAdminNote] = useState('');
   const [actionLoading, setActionLoading] = useState(false);
   const [alertFeedback, setAlertFeedback] = useState(null);
 
@@ -55,18 +56,26 @@ const JobModeration = () => {
   const handleOpenActionModal = (job, type) => {
     setSelectedJob(job);
     setActionType(type);
+    setAdminNote('');
     setActionModalOpen(true);
   };
 
   const handleExecuteAction = async () => {
     if (!selectedJob) return;
+    if (actionType === 'delete' && !adminNote.trim()) {
+      setAlertFeedback({
+        type: 'error',
+        message: 'Keterangan alasan penghapusan wajib diisi.',
+      });
+      return;
+    }
     setActionLoading(true);
     try {
       if (actionType === 'delete') {
-        await adminService.deleteJob(selectedJob.id);
+        await adminService.deleteJob(selectedJob.id, adminNote.trim());
         setAlertFeedback({
           type: 'success',
-          message: `Lowongan "${selectedJob.title}" berhasil dihapus.`,
+          message: `Lowongan "${selectedJob.title}" berhasil dihapus dari beranda.`,
         });
       } else {
         await adminService.updateJobStatus(selectedJob.id, actionType);
@@ -79,6 +88,7 @@ const JobModeration = () => {
       }
       setActionModalOpen(false);
       setSelectedJob(null);
+      setAdminNote('');
       fetchJobs();
     } catch (err) {
       setAlertFeedback({
@@ -363,11 +373,30 @@ const JobModeration = () => {
               </div>
             </div>
 
-            <p className="text-sm text-slate-600 leading-relaxed mb-6">
+            <p className="text-sm text-slate-600 leading-relaxed mb-4">
               Apakah Anda yakin ingin {actionType === 'delete' ? 'menghapus' : actionType === 'active' ? 'mengaktifkan kembali' : 'menutup'}{' '}
               lowongan <strong className="text-slate-900">{selectedJob.title}</strong> dari{' '}
               <strong className="text-slate-900">{selectedJob.company?.company_name}</strong>?
             </p>
+
+            {actionType === 'delete' && (
+              <div className="mb-5">
+                <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                  Keterangan / Alasan Penghapusan <span className="text-rose-500">*</span>
+                </label>
+                <textarea
+                  rows={3}
+                  value={adminNote}
+                  onChange={(e) => setAdminNote(e.target.value)}
+                  placeholder="Contoh: Lowongan melanggar ketentuan / informasi gaji tidak sesuai..."
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500"
+                  required
+                />
+                <p className="text-[11px] text-slate-400 mt-1">
+                  Lowongan akan dihapus dari beranda, namun tetap tampil sebagai nonaktif beserta keterangan ini di dashboard perusahaan.
+                </p>
+              </div>
+            )}
 
             <div className="flex justify-end gap-3">
               <button
@@ -376,6 +405,7 @@ const JobModeration = () => {
                 onClick={() => {
                   setActionModalOpen(false);
                   setSelectedJob(null);
+                  setAdminNote('');
                 }}
                 className="px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-100 border border-slate-200 transition"
               >
@@ -383,7 +413,7 @@ const JobModeration = () => {
               </button>
               <button
                 type="button"
-                disabled={actionLoading}
+                disabled={actionLoading || (actionType === 'delete' && !adminNote.trim())}
                 onClick={handleExecuteAction}
                 className={`px-4 py-2 rounded-xl text-xs font-semibold text-white transition ${
                   actionType === 'delete'

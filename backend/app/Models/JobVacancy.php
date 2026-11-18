@@ -28,6 +28,8 @@ class JobVacancy extends Model
         'interview_end_date',
         'announcement_date',
         'status',
+        'is_removed_by_admin',
+        'admin_note',
     ];
 
     protected function casts(): array
@@ -39,6 +41,7 @@ class JobVacancy extends Model
             'announcement_date' => 'date',
             'salary_min' => 'decimal:2',
             'salary_max' => 'decimal:2',
+            'is_removed_by_admin' => 'boolean',
         ];
     }
 

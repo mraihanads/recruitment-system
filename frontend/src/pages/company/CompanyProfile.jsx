@@ -444,11 +444,10 @@ const CompanyProfile = () => {
       {/* Global Feedback Banner */}
       {feedback.message && (
         <div
-          className={`p-4 rounded-2xl border text-xs font-medium flex items-center justify-between gap-3 ${
-            feedback.type === 'success'
-              ? 'bg-emerald-50 text-emerald-800 border-emerald-200'
-              : 'bg-rose-50 text-rose-800 border-rose-200'
-          }`}
+          className={`p-4 rounded-2xl border text-xs font-medium flex items-center justify-between gap-3 ${feedback.type === 'success'
+            ? 'bg-emerald-50 text-emerald-800 border-emerald-200'
+            : 'bg-rose-50 text-rose-800 border-rose-200'
+            }`}
         >
           <span>{feedback.message}</span>
           <button

@@ -347,8 +347,15 @@ const CompanyJobs = () => {
           {/* Job Cards Grid */}
           <div className="grid grid-cols-1 gap-4">
             {jobs.map((job) => {
+              const isRemovedByAdmin = Boolean(job.is_removed_by_admin);
               const currentStatus = (job.status || 'draft').toLowerCase();
-              const badge = statusConfig[currentStatus] || statusConfig.draft;
+              const badge = isRemovedByAdmin
+                ? {
+                    label: 'Dihapus Admin',
+                    color: 'bg-rose-100 text-rose-800 border-rose-300',
+                    dot: 'bg-rose-600',
+                  }
+                : statusConfig[currentStatus] || statusConfig.draft;
               const formattedSalary = (() => {
                 if (job.salary_min && job.salary_max) {
                   return `${formatCurrency(job.salary_min)} - ${formatCurrency(job.salary_max)}`;
@@ -361,9 +368,14 @@ const CompanyJobs = () => {
               return (
                 <div
                   key={job.id}
-                  className="bg-white rounded-3xl border border-slate-200/80 p-5 sm:p-6 shadow-xs hover:border-blue-300 transition-all flex flex-col md:flex-row items-start md:items-center justify-between gap-5 group"
+                  className={`rounded-3xl border p-5 sm:p-6 shadow-xs transition-all flex flex-col gap-4 group ${
+                    isRemovedByAdmin
+                      ? 'bg-slate-50/90 border-rose-200 opacity-80'
+                      : 'bg-white border-slate-200/80 hover:border-blue-300'
+                  }`}
                   data-testid={`company-job-card-${job.id}`}
                 >
+                  <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-5 w-full">
                   <div className="space-y-2.5 min-w-0 flex-1">
                     <div className="flex flex-wrap items-center gap-2">
                       <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg text-xs font-bold border ${badge.color}`}>
@@ -443,30 +455,53 @@ const CompanyJobs = () => {
                         Detail
                       </Link>
 
-                      <Link
-                        to={`/company/jobs/${job.id}/edit`}
-                        className="flex-1 md:flex-none text-center px-3.5 py-2 rounded-xl text-xs font-bold text-blue-600 bg-blue-50 hover:bg-blue-600 hover:text-white transition-colors"
-                      >
-                        Edit
-                      </Link>
+                      {isRemovedByAdmin ? (
+                        <>
+                          <button
+                            type="button"
+                            disabled
+                            title="Lowongan dinonaktifkan oleh admin"
+                            className="flex-1 md:flex-none text-center px-3.5 py-2 rounded-xl text-xs font-bold text-slate-400 bg-slate-200/70 cursor-not-allowed"
+                          >
+                            Edit
+                          </button>
+                          <button
+                            type="button"
+                            disabled
+                            title="Lowongan dinonaktifkan oleh admin"
+                            className="flex-1 md:flex-none text-center px-3.5 py-2 rounded-xl text-xs font-bold text-slate-400 bg-slate-200/70 cursor-not-allowed"
+                          >
+                            Dinonaktifkan
+                          </button>
+                        </>
+                      ) : (
+                        <>
+                          <Link
+                            to={`/company/jobs/${job.id}/edit`}
+                            className="flex-1 md:flex-none text-center px-3.5 py-2 rounded-xl text-xs font-bold text-blue-600 bg-blue-50 hover:bg-blue-600 hover:text-white transition-colors"
+                          >
+                            Edit
+                          </Link>
 
-                      {/* Toggle status button */}
-                      <button
-                        type="button"
-                        onClick={() => handleToggleStatus(job)}
-                        disabled={updatingId === job.id}
-                        className={`flex-1 md:flex-none text-center px-3.5 py-2 rounded-xl text-xs font-bold transition-colors ${
-                          job.status === 'active'
-                            ? 'text-rose-600 bg-rose-50 hover:bg-rose-600 hover:text-white'
-                            : 'text-emerald-700 bg-emerald-50 hover:bg-emerald-600 hover:text-white'
-                        }`}
-                      >
-                        {updatingId === job.id
-                          ? 'Memproses...'
-                          : job.status === 'active'
-                          ? 'Tutup'
-                          : 'Aktifkan'}
-                      </button>
+                          {/* Toggle status button */}
+                          <button
+                            type="button"
+                            onClick={() => handleToggleStatus(job)}
+                            disabled={updatingId === job.id}
+                            className={`flex-1 md:flex-none text-center px-3.5 py-2 rounded-xl text-xs font-bold transition-colors ${
+                              job.status === 'active'
+                                ? 'text-rose-600 bg-rose-50 hover:bg-rose-600 hover:text-white'
+                                : 'text-emerald-700 bg-emerald-50 hover:bg-emerald-600 hover:text-white'
+                            }`}
+                          >
+                            {updatingId === job.id
+                              ? 'Memproses...'
+                              : job.status === 'active'
+                              ? 'Tutup'
+                              : 'Aktifkan'}
+                          </button>
+                        </>
+                      )}
                     </div>
 
                     {/* Delete button (only if no applicants) */}
@@ -481,6 +516,20 @@ const CompanyJobs = () => {
                       </button>
                     )}
                   </div>
+                  </div>
+
+                  {/* Admin Removal Note Banner */}
+                  {isRemovedByAdmin && (
+                    <div className="w-full rounded-2xl bg-rose-50 border border-rose-200 px-4 py-3 flex items-start gap-2.5 text-xs text-rose-800">
+                      <svg className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" />
+                      </svg>
+                      <div>
+                        <span className="font-bold block">Lowongan ini dihapus dari beranda oleh Admin:</span>
+                        <span className="text-rose-700">{job.admin_note || 'Melanggar ketentuan platform.'}</span>
+                      </div>
+                    </div>
+                  )}
                 </div>
               );
             })}
