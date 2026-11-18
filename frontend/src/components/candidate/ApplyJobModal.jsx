@@ -10,7 +10,7 @@ const ApplyJobModal = ({
   candidateProfile,
   onApplySuccess,
 }) => {
-  const [coverLetter, setCoverLetter] = useState('');
+  const [coverLetterFiles, setCoverLetterFiles] = useState([]);
   const [submitting, setSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
 
@@ -19,23 +19,61 @@ const ApplyJobModal = ({
   const matchPercentage = matchData?.match_percentage ?? 0;
   const hasCv = Boolean(candidateProfile?.cv_file);
 
+  const missingBiodata = [];
+  if (!candidateProfile?.full_name?.trim()) missingBiodata.push('Nama Lengkap');
+  if (!candidateProfile?.phone?.trim()) missingBiodata.push('Nomor Telepon');
+  if (!candidateProfile?.gender) missingBiodata.push('Jenis Kelamin');
+  if (!candidateProfile?.birth_date) missingBiodata.push('Tanggal Lahir');
+  if (!candidateProfile?.address?.trim()) missingBiodata.push('Alamat Domisili');
+  if (!candidateProfile?.bio?.trim()) missingBiodata.push('Ringkasan Profil (Bio)');
+
+  const isBiodataComplete = missingBiodata.length === 0;
+  const canApply = isBiodataComplete && hasCv && coverLetterFiles.length > 0;
+
+  const handleAddFiles = (e) => {
+    const selected = Array.from(e.target.files || []);
+    if (selected.length === 0) return;
+    setCoverLetterFiles((prev) => {
+      const existingNames = new Set(prev.map((f) => f.name));
+      const newUnique = selected.filter((f) => !existingNames.has(f.name));
+      return [...prev, ...newUnique];
+    });
+    e.target.value = '';
+  };
+
+  const handleRemoveFile = (indexToRemove) => {
+    setCoverLetterFiles((prev) => prev.filter((_, idx) => idx !== indexToRemove));
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setErrorMessage('');
+
+    if (!isBiodataComplete) {
+      setErrorMessage(`Silakan lengkapi biodata Anda terlebih dahulu (${missingBiodata.join(', ')}) di menu Profil sebelum melamar.`);
+      return;
+    }
 
     if (!hasCv) {
       setErrorMessage('Anda belum mengunggah CV. Silakan unggah CV terlebih dahulu di menu Profil sebelum melamar.');
       return;
     }
 
+    if (coverLetterFiles.length === 0) {
+      setErrorMessage('Silakan unggah minimal 1 berkas Surat Lamaran / Dokumen Persyaratan yang diminta perusahaan.');
+      return;
+    }
+
     setSubmitting(true);
     try {
-      const payload = {
-        cover_letter: coverLetter.trim() || null,
-      };
+      const payload = new FormData();
+      coverLetterFiles.forEach((file) => {
+        payload.append('cover_letter_files[]', file, file.name);
+      });
 
       const res = await candidateService.applyJob(job.id, payload);
       if (res?.success) {
+        setCoverLetterFiles([]);
         onApplySuccess(res.data);
       } else {
         setErrorMessage(res?.message || 'Gagal mengirimkan lamaran. Silakan coba lagi.');
@@ -60,13 +98,13 @@ const ApplyJobModal = ({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-in fade-in duration-200"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-in fade-in duration-200 overflow-y-auto"
       role="dialog"
       aria-modal="true"
     >
-      <div className="relative w-full max-w-lg bg-white rounded-3xl shadow-2xl border border-slate-100 overflow-hidden">
+      <div className="relative w-full max-w-lg max-h-[90vh] flex flex-col bg-white rounded-3xl shadow-2xl border border-slate-100 overflow-hidden my-auto">
         {/* Modal Header */}
-        <div className="p-6 pb-4 border-b border-slate-100 flex items-center justify-between">
+        <div className="p-6 pb-4 border-b border-slate-100 flex items-center justify-between shrink-0 bg-white">
           <div>
             <h3 className="text-lg font-bold text-slate-900">Konfirmasi Lamaran Kerja</h3>
             <p className="text-xs text-slate-500 mt-0.5">
@@ -86,7 +124,7 @@ const ApplyJobModal = ({
         </div>
 
         {/* Modal Body */}
-        <form onSubmit={handleSubmit} className="p-6 space-y-5">
+        <form onSubmit={handleSubmit} className="p-6 space-y-5 overflow-y-auto flex-1">
           {/* Error Alert */}
           {errorMessage && (
             <div className="p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs flex items-start gap-2.5">
@@ -124,6 +162,50 @@ const ApplyJobModal = ({
                 {matchPercentage}% Match
               </span>
             </div>
+          </div>
+
+          {/* Biodata Completeness Section */}
+          <div>
+            <label className="block text-xs font-bold text-slate-700 mb-1.5">
+              Status Kelengkapan Biodata Diri
+            </label>
+            {isBiodataComplete ? (
+              <div className="flex items-center justify-between p-3 rounded-xl border border-emerald-200 bg-emerald-50/50">
+                <div className="flex items-center gap-2.5 min-w-0">
+                  <div className="w-8 h-8 rounded-lg bg-emerald-100 text-emerald-600 flex items-center justify-center shrink-0">
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-xs font-bold text-slate-800 truncate">
+                      Biodata Diri Lengkap
+                    </p>
+                    <p className="text-[11px] text-emerald-700">
+                      {candidateProfile.full_name} • {candidateProfile.phone}
+                    </p>
+                  </div>
+                </div>
+                <span className="text-xs font-bold text-emerald-600 bg-white px-2 py-1 rounded-md border border-emerald-200">
+                  Lengkap
+                </span>
+              </div>
+            ) : (
+              <div className="p-3 rounded-xl border border-amber-200 bg-amber-50 text-xs text-amber-800 space-y-1.5">
+                <p className="font-bold text-amber-900">
+                  Biodata diri Anda belum lengkap!
+                </p>
+                <p className="text-[11px] text-amber-700 leading-relaxed">
+                  Wajib dilengkapi sebelum melamar: <strong>{missingBiodata.join(', ')}</strong>.
+                </p>
+                <Link
+                  to="/candidate/profile"
+                  className="inline-flex items-center gap-1 font-bold text-blue-600 hover:text-blue-700 underline pt-0.5"
+                >
+                  Lengkapi Biodata di Menu Profil &rarr;
+                </Link>
+              </div>
+            )}
           </div>
 
           {/* CV Section */}
@@ -165,23 +247,84 @@ const ApplyJobModal = ({
             )}
           </div>
 
-          {/* Cover Letter Input */}
+          {/* Cover Letter / Requirements Multi-File Upload */}
           <div>
             <div className="flex items-center justify-between mb-1.5">
-              <label htmlFor="cover-letter" className="block text-xs font-bold text-slate-700">
-                Surat Lamaran (Cover Letter)
+              <label htmlFor="cover-letter-file" className="block text-xs font-bold text-slate-700">
+                Unggah Surat Lamaran & Berkas Persyaratan <span className="text-rose-500">*</span>
               </label>
-              <span className="text-[11px] text-slate-400 font-medium">Opsional</span>
+              {coverLetterFiles.length > 0 ? (
+                <span className="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
+                  ✓ {coverLetterFiles.length} Berkas Dipilih
+                </span>
+              ) : (
+                <span className="text-[11px] text-amber-600 font-semibold">Wajib Diunggah</span>
+              )}
             </div>
-            <textarea
-              id="cover-letter"
-              rows={4}
-              value={coverLetter}
-              onChange={(e) => setCoverLetter(e.target.value)}
-              placeholder="Jelaskan secara singkat alasan Anda tertarik dan kualifikasi yang Anda miliki untuk posisi ini..."
-              className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 placeholder:text-slate-400 transition-all resize-none"
-              disabled={submitting}
-            />
+
+            {job.requirements && (
+              <div className="mb-2.5 p-3 rounded-xl bg-blue-50/60 border border-blue-100 text-[11px] text-slate-600">
+                <span className="font-bold text-blue-900 block mb-0.5">Persyaratan yang Diminta Perusahaan:</span>
+                <p className="whitespace-pre-line line-clamp-3 leading-relaxed">{job.requirements}</p>
+              </div>
+            )}
+
+            <div className="p-3.5 rounded-xl border border-slate-200 bg-slate-50/60 space-y-2.5">
+              <div className="flex items-center justify-between gap-2">
+                <label
+                  htmlFor="cover-letter-file"
+                  className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold cursor-pointer transition-colors shadow-xs"
+                >
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                  </svg>
+                  {coverLetterFiles.length > 0 ? 'Tambah Berkas Lainnya' : 'Pilih Berkas (Bisa Banyak File)'}
+                </label>
+                <input
+                  id="cover-letter-file"
+                  type="file"
+                  multiple
+                  accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.zip"
+                  onChange={handleAddFiles}
+                  disabled={submitting}
+                  className="hidden"
+                />
+                <span className="text-[11px] text-slate-400">
+                  Bisa pilih beberapa file sekaligus
+                </span>
+              </div>
+
+              {coverLetterFiles.length > 0 && (
+                <div className="space-y-1.5 pt-1">
+                  {coverLetterFiles.map((file, idx) => (
+                    <div
+                      key={`${file.name}-${idx}`}
+                      className="flex items-center justify-between gap-2 px-3 py-2 rounded-xl bg-white border border-emerald-200 text-xs"
+                    >
+                      <div className="flex items-center gap-2 min-w-0">
+                        <span className="w-5 h-5 rounded-md bg-emerald-100 text-emerald-700 font-bold text-[10px] flex items-center justify-center shrink-0">
+                          {idx + 1}
+                        </span>
+                        <span className="font-semibold text-slate-800 truncate">{file.name}</span>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveFile(idx)}
+                        disabled={submitting}
+                        className="text-rose-500 hover:text-rose-700 font-bold text-xs px-1.5 py-0.5 rounded hover:bg-rose-50 shrink-0"
+                        title="Hapus berkas ini"
+                      >
+                        ✕
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              <p className="text-[11px] text-slate-400">
+                Lampirkan Surat Lamaran beserta dokumen persyaratan yang diminta perusahaan seperti Ijazah, Transkrip, Sertifikat, dll. (Format: PDF, DOC, DOCX, JPG, PNG, ZIP — Maks 10MB/file).
+              </p>
+            </div>
           </div>
 
           {/* Footer Actions */}
@@ -196,9 +339,9 @@ const ApplyJobModal = ({
             </button>
             <button
               type="submit"
-              disabled={submitting || !hasCv}
+              disabled={submitting || !canApply}
               className={`inline-flex items-center gap-2 px-5 py-2 text-xs font-bold text-white rounded-xl shadow-xs transition-all ${
-                submitting || !hasCv
+                submitting || !canApply
                   ? 'bg-blue-300 cursor-not-allowed'
                   : 'bg-blue-600 hover:bg-blue-700 active:scale-95'
               }`}

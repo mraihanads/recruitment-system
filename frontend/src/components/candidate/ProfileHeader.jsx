@@ -1,7 +1,9 @@
 import React, { useRef, useState } from 'react';
+import { useAuth } from '../../context/AuthContext';
 import candidateService from '../../services/candidateService';
 
 const ProfileHeader = ({ profile, onPhotoUpdated, onCvUpdated }) => {
+  const { refreshUser } = useAuth();
   const photoInputRef = useRef(null);
   const cvInputRef = useRef(null);
   const [photoLoading, setPhotoLoading] = useState(false);
@@ -34,6 +36,7 @@ const ProfileHeader = ({ profile, onPhotoUpdated, onCvUpdated }) => {
       const res = await candidateService.uploadPhoto(file);
       setPhotoSuccess(res?.message || 'Foto profil berhasil diperbarui.');
       if (onPhotoUpdated) onPhotoUpdated(res.data);
+      await refreshUser();
     } catch (err) {
       setPhotoError(
         err.response?.data?.message ||
@@ -72,6 +75,7 @@ const ProfileHeader = ({ profile, onPhotoUpdated, onCvUpdated }) => {
       const res = await candidateService.uploadCv(file);
       setCvSuccess(res?.message || 'File CV berhasil diunggah.');
       if (onCvUpdated) onCvUpdated(res.data);
+      await refreshUser();
     } catch (err) {
       setCvError(
         err.response?.data?.message ||
@@ -201,6 +205,11 @@ const ProfileHeader = ({ profile, onPhotoUpdated, onCvUpdated }) => {
               )}
             </button>
           </div>
+          {profile?.cv_file && (
+            <p className="text-xs font-semibold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200 max-w-xs truncate" title={profile.cv_file.split('/').pop()}>
+              📄 {profile.cv_file.split('/').pop()}
+            </p>
+          )}
           <p className="text-[11px] text-slate-400">Format: PDF, DOC, DOCX (Maks 5MB)</p>
         </div>
       </div>

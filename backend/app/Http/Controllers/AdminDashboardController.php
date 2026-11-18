@@ -51,9 +51,15 @@ class AdminDashboardController extends Controller
             'company:id,company_name,logo',
             'category:id,name',
         ])
+            ->where(function ($q) {
+                $q->where('is_removed_by_admin', false)->orWhereNull('is_removed_by_admin');
+            })
             ->latest()
             ->take(5)
-            ->get(['id', 'company_id', 'category_id', 'title', 'status', 'location', 'created_at']);
+            ->get([
+                'id', 'company_id', 'category_id', 'title', 'status', 'location',
+                'education', 'deadline', 'interview_start_date', 'interview_end_date', 'announcement_date', 'created_at'
+            ]);
 
         $recentApplications = Application::with([
             'candidateProfile:id,user_id,full_name',

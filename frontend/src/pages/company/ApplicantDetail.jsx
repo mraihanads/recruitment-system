@@ -544,117 +544,6 @@ const ApplicantDetail = () => {
               </div>
             </div>
           </div>
-
-          {/* Card 3: Riwayat Pendidikan (Education) */}
-          <div className="bg-white rounded-3xl border border-slate-200/80 p-6 shadow-xs">
-            <h2 className="text-base font-bold text-slate-900 mb-4 flex items-center gap-2.5">
-              <span className="w-2 h-5 rounded-full bg-indigo-600" />
-              Riwayat Pendidikan (Education)
-            </h2>
-
-            {candidate?.educations && candidate.educations.length > 0 ? (
-              <div className="space-y-4">
-                {candidate.educations.map((edu) => (
-                  <div key={edu.id} className="p-4 rounded-2xl bg-slate-50 border border-slate-100 space-y-1">
-                    <div className="flex items-center justify-between text-xs">
-                      <span className="font-bold text-slate-900 text-sm">{edu.institution}</span>
-                      <span className="text-slate-500 font-semibold">
-                        {edu.start_year} - {edu.end_year || 'Sekarang'}
-                      </span>
-                    </div>
-                    <p className="text-xs text-blue-700 font-semibold">
-                      {edu.degree} • {edu.field_of_study}
-                    </p>
-                    {edu.description && (
-                      <p className="text-xs text-slate-600 pt-1 leading-relaxed">{edu.description}</p>
-                    )}
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <p className="text-xs text-slate-400 italic">Belum ada riwayat pendidikan yang dicantumkan.</p>
-            )}
-          </div>
-
-          {/* Card 4: Pengalaman Kerja (Experience) */}
-          <div className="bg-white rounded-3xl border border-slate-200/80 p-6 shadow-xs">
-            <h2 className="text-base font-bold text-slate-900 mb-4 flex items-center gap-2.5">
-              <span className="w-2 h-5 rounded-full bg-amber-600" />
-              Pengalaman Kerja (Experience)
-            </h2>
-
-            {candidate?.experiences && candidate.experiences.length > 0 ? (
-              <div className="space-y-4">
-                {candidate.experiences.map((exp) => (
-                  <div key={exp.id} className="p-4 rounded-2xl bg-slate-50 border border-slate-100 space-y-1">
-                    <div className="flex items-center justify-between text-xs">
-                      <span className="font-bold text-slate-900 text-sm">{exp.position}</span>
-                      <span className="text-slate-500 font-semibold">
-                        {formatDate(exp.start_date)} - {exp.end_date ? formatDate(exp.end_date) : 'Sekarang'}
-                      </span>
-                    </div>
-                    <p className="text-xs text-amber-700 font-semibold">{exp.company_name}</p>
-                    {exp.description && (
-                      <p className="text-xs text-slate-600 pt-1 leading-relaxed whitespace-pre-line">
-                        {exp.description}
-                      </p>
-                    )}
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <p className="text-xs text-slate-400 italic">Belum ada pengalaman kerja yang dicantumkan.</p>
-            )}
-          </div>
-
-          {/* Card 5: Portofolio Proyek */}
-          <div className="bg-white rounded-3xl border border-slate-200/80 p-6 shadow-xs">
-            <h2 className="text-base font-bold text-slate-900 mb-4 flex items-center gap-2.5">
-              <span className="w-2 h-5 rounded-full bg-purple-600" />
-              Portofolio Proyek
-            </h2>
-
-            {candidate?.portfolios && candidate.portfolios.length > 0 ? (
-              <div className="space-y-4">
-                {candidate.portfolios.map((port) => {
-                  const portImg = port.image_url || resolveMediaUrl(port.image);
-                  return (
-                    <div key={port.id} className="p-4 rounded-2xl bg-slate-50 border border-slate-100 space-y-2">
-                      <div className="flex items-start justify-between gap-3">
-                        <div className="space-y-1">
-                          <h3 className="font-bold text-slate-900 text-sm">{port.title}</h3>
-                          {port.project_url && (
-                            <a
-                              href={port.project_url}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="text-xs text-blue-600 hover:underline font-semibold block break-all"
-                            >
-                              🔗 {port.project_url}
-                            </a>
-                          )}
-                        </div>
-                        {portImg && (
-                          <img
-                            src={portImg}
-                            alt={port.title}
-                            className="w-16 h-16 rounded-xl object-cover border border-slate-200 shrink-0"
-                          />
-                        )}
-                      </div>
-                      {port.description && (
-                        <p className="text-xs text-slate-600 leading-relaxed whitespace-pre-line">
-                          {port.description}
-                        </p>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
-            ) : (
-              <p className="text-xs text-slate-400 italic">Belum ada portofolio proyek yang dicantumkan.</p>
-            )}
-          </div>
         </div>
 
         {/* Kolom Kanan / Sidebar: Sesi Interview, Berkas CV, Cover Letter, Status History & Notes */}
@@ -786,17 +675,52 @@ const ApplicantDetail = () => {
               <p className="text-xs text-slate-400 italic">Berkas CV tidak disertakan.</p>
             )}
 
-            {/* Cover Letter */}
+            {/* Cover Letter / Requirements Documents */}
             <div className="pt-2">
-              <span className="text-xs font-bold text-slate-700 block mb-1.5">
-                Surat Lamaran (Cover Letter):
+              <span className="text-xs font-bold text-slate-700 block mb-2">
+                Surat Lamaran & Berkas Persyaratan ({application.cover_letter_files?.length || (application.cover_letter ? 1 : 0)}):
               </span>
-              {application.cover_letter ? (
+              {application.cover_letter_files && application.cover_letter_files.length > 0 ? (
+                <div className="space-y-2.5">
+                  {application.cover_letter_files.map((fileItem, idx) => (
+                    <div key={idx} className="p-3.5 rounded-2xl bg-indigo-50/60 border border-indigo-100 space-y-2.5">
+                      <div className="flex items-center gap-3">
+                        <div className="w-9 h-9 rounded-xl bg-indigo-600 text-white flex items-center justify-center font-bold text-xs shrink-0">
+                          #{idx + 1}
+                        </div>
+                        <div className="min-w-0">
+                          <p className="text-xs font-bold text-slate-900 truncate" title={fileItem.name}>
+                            {fileItem.name}
+                          </p>
+                          <p className="text-[11px] text-indigo-700">Berkas Persyaratan / Surat Lamaran</p>
+                        </div>
+                      </div>
+                      <div className="flex gap-2">
+                        <a
+                          href={fileItem.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex-1 text-center py-1.5 px-3 rounded-xl text-xs font-bold bg-indigo-600 hover:bg-indigo-700 text-white shadow-xs transition-colors"
+                        >
+                          Lihat Berkas
+                        </a>
+                        <a
+                          href={fileItem.url}
+                          download
+                          className="flex-1 text-center py-1.5 px-3 rounded-xl text-xs font-bold bg-white hover:bg-slate-50 text-indigo-700 border border-indigo-200 transition-colors"
+                        >
+                          Download
+                        </a>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : application.cover_letter ? (
                 <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-100 text-xs text-slate-700 leading-relaxed whitespace-pre-line">
                   {application.cover_letter}
                 </div>
               ) : (
-                <p className="text-xs text-slate-400 italic">Kandidat tidak menyertakan cover letter.</p>
+                <p className="text-xs text-slate-400 italic">Kandidat tidak menyertakan berkas surat lamaran.</p>
               )}
             </div>
           </div>

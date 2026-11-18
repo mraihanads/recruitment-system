@@ -24,6 +24,28 @@ class CandidateProfile extends Model
         'cv_file',
     ];
 
+    protected $appends = ['photo_url', 'cv_url'];
+
+    public function getPhotoUrlAttribute(): ?string
+    {
+        if (!$this->photo) return null;
+        if (str_starts_with($this->photo, 'http://') || str_starts_with($this->photo, 'https://')) {
+            return $this->photo;
+        }
+        $clean = ltrim(preg_replace('/^public\//', '', $this->photo), '/');
+        return "http://127.0.0.1:8000/storage/{$clean}";
+    }
+
+    public function getCvUrlAttribute(): ?string
+    {
+        if (!$this->cv_file) return null;
+        if (str_starts_with($this->cv_file, 'http://') || str_starts_with($this->cv_file, 'https://')) {
+            return $this->cv_file;
+        }
+        $clean = ltrim(preg_replace('/^public\//', '', $this->cv_file), '/');
+        return "http://127.0.0.1:8000/storage/{$clean}";
+    }
+
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);

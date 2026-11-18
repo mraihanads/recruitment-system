@@ -300,9 +300,29 @@ const AdminDashboard = () => {
             <div className="divide-y divide-slate-100">
               {stats.recent_jobs.map((j) => (
                 <div key={j.id} className="py-3 flex items-center justify-between first:pt-0 last:pb-0">
-                  <div className="min-w-0">
+                  <div className="min-w-0 pr-3">
                     <p className="text-sm font-semibold text-slate-800 truncate">{j.title}</p>
-                    <p className="text-xs text-slate-400 truncate">{j.company?.company_name} • {j.category?.name || 'Kategori'}</p>
+                    <p className="text-xs text-slate-400 truncate">
+                      {j.company?.company_name} • {j.category?.name || 'Kategori'}
+                      {j.education ? ` • Min. ${j.education}` : ''}
+                    </p>
+                    <div className="flex flex-wrap gap-x-3 gap-y-0.5 text-[11px] text-slate-500 mt-1">
+                      {j.deadline && (
+                        <span className="text-rose-600 font-medium">
+                          Batas: {new Date(j.deadline).toLocaleDateString('id-ID')}
+                        </span>
+                      )}
+                      {(j.interview_start_date || j.interview_end_date) && (
+                        <span>
+                          Wawancara: {j.interview_start_date ? new Date(j.interview_start_date).toLocaleDateString('id-ID') : '-'} s/d {j.interview_end_date ? new Date(j.interview_end_date).toLocaleDateString('id-ID') : '-'}
+                        </span>
+                      )}
+                      {j.announcement_date && (
+                        <span className="text-emerald-600 font-medium">
+                          Pengumuman: {new Date(j.announcement_date).toLocaleDateString('id-ID')}
+                        </span>
+                      )}
+                    </div>
                   </div>
                   <div className="shrink-0">
                     {getStatusBadge(j.status)}

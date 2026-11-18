@@ -270,9 +270,19 @@ const JobModeration = () => {
                     </td>
                     <td className="py-4 px-4 text-xs">
                       <span className="font-medium capitalize text-slate-800">{j.job_type || j.employment_type || '-'}</span>
-                      <span className="block text-slate-400">
+                      <span className="block text-rose-600 font-medium mt-0.5">
                         Batas: {j.deadline ? new Date(j.deadline).toLocaleDateString('id-ID') : '-'}
                       </span>
+                      {(j.interview_start_date || j.interview_end_date) && (
+                        <span className="block text-slate-400 text-[11px]">
+                          Wawancara: {j.interview_start_date ? new Date(j.interview_start_date).toLocaleDateString('id-ID') : '-'} - {j.interview_end_date ? new Date(j.interview_end_date).toLocaleDateString('id-ID') : '-'}
+                        </span>
+                      )}
+                      {j.announcement_date && (
+                        <span className="block text-emerald-600 text-[11px]">
+                          Pengumuman: {new Date(j.announcement_date).toLocaleDateString('id-ID')}
+                        </span>
+                      )}
                     </td>
                     <td className="py-4 px-4">{getStatusBadge(j.status)}</td>
                     <td className="py-4 px-4">
@@ -469,6 +479,46 @@ const JobModeration = () => {
                 <div>
                   <span className="text-xs text-slate-400 block">Total Pelamar</span>
                   <span className="font-semibold text-blue-600">{selectedJob.applications_count || 0} Pelamar</span>
+                </div>
+                <div>
+                  <span className="text-xs text-slate-400 block">Pendidikan Minimal</span>
+                  <span className="font-semibold text-slate-800">{selectedJob.education || '-'}</span>
+                </div>
+                <div>
+                  <span className="text-xs text-slate-400 block">Rentang Gaji</span>
+                  <span className="font-semibold text-emerald-700">
+                    {selectedJob.salary_min || selectedJob.salary_max
+                      ? `${
+                          selectedJob.salary_min
+                            ? new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(selectedJob.salary_min)
+                            : '0'
+                        } - ${
+                          selectedJob.salary_max
+                            ? new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(selectedJob.salary_max)
+                            : 'Negosiasi'
+                        }`
+                      : 'Dirahasiakan / Kompetitif'}
+                  </span>
+                </div>
+                <div>
+                  <span className="text-xs text-slate-400 block">Batas Akhir Lamaran</span>
+                  <span className="font-semibold text-rose-600">
+                    {selectedJob.deadline ? new Date(selectedJob.deadline).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }) : '-'}
+                  </span>
+                </div>
+                <div>
+                  <span className="text-xs text-slate-400 block">Tanggal Pengumuman</span>
+                  <span className="font-semibold text-emerald-700">
+                    {selectedJob.announcement_date ? new Date(selectedJob.announcement_date).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }) : '-'}
+                  </span>
+                </div>
+                <div className="col-span-2">
+                  <span className="text-xs text-slate-400 block">Jadwal Wawancara</span>
+                  <span className="font-semibold text-slate-800">
+                    {selectedJob.interview_start_date || selectedJob.interview_end_date
+                      ? `${selectedJob.interview_start_date ? new Date(selectedJob.interview_start_date).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }) : '-'} s/d ${selectedJob.interview_end_date ? new Date(selectedJob.interview_end_date).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }) : '-'}`
+                      : '-'}
+                  </span>
                 </div>
               </div>
 

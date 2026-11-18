@@ -80,12 +80,20 @@ class CandidateProfileController extends Controller
     public function uploadCv(Request $request): JsonResponse
     {
         $request->validate([
-            'cv_file' => ['required', 'file', 'mimes:pdf,doc,docx', 'max:5120'],
+            'cv_file' => ['required', 'file', 'max:10240'],
         ], [
             'cv_file.required' => 'File CV wajib diunggah.',
-            'cv_file.mimes' => 'Format file CV harus berupa PDF, DOC, atau DOCX.',
-            'cv_file.max' => 'Ukuran file CV maksimal 5MB.',
+            'cv_file.max' => 'Ukuran file CV maksimal 10MB.',
         ]);
+
+        $allowedExtensions = ['pdf', 'doc', 'docx'];
+        $extension = strtolower($request->file('cv_file')->getClientOriginalExtension());
+        if (!in_array($extension, $allowedExtensions)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Format file CV harus berupa PDF, DOC, atau DOCX.',
+            ], 422);
+        }
 
         $user = $request->user();
         $profile = $user->candidateProfile ?? CandidateProfile::create([
@@ -97,15 +105,24 @@ class CandidateProfileController extends Controller
             Storage::disk('public')->delete($profile->cv_file);
         }
 
-        $path = $request->file('cv_file')->store('candidate/cvs', 'public');
+        $uploadedFile = $request->file('cv_file');
+        $originalName = $uploadedFile->getClientOriginalName();
+        // Clean dangerous path characters while preserving readable original filename
+        $safeOriginalName = preg_replace('/[^A-Za-z0-9._\- ()]/', '_', basename($originalName));
+        if (empty($safeOriginalName)) {
+            $safeOriginalName = 'CV_' . $profile->id . '.' . $extension;
+        }
+
+        $path = $uploadedFile->storeAs("candidate/cvs/{$profile->id}", $safeOriginalName, 'public');
         $profile->update(['cv_file' => $path]);
+        $freshProfile = $profile->fresh();
 
         return response()->json([
             'success' => true,
             'message' => 'CV berhasil diunggah.',
             'data' => [
-                'cv_file' => $path,
-                'cv_url' => Storage::disk('public')->url($path),
+                'cv_file' => $freshProfile->cv_file,
+                'cv_url' => $freshProfile->cv_url,
             ],
         ]);
     }
@@ -116,13 +133,20 @@ class CandidateProfileController extends Controller
     public function uploadPhoto(Request $request): JsonResponse
     {
         $request->validate([
-            'photo' => ['required', 'image', 'mimes:jpg,jpeg,png', 'max:2048'],
+            'photo' => ['required', 'file', 'max:5120'],
         ], [
             'photo.required' => 'Foto profil wajib diunggah.',
-            'photo.image' => 'File harus berupa gambar.',
-            'photo.mimes' => 'Format foto harus berupa JPG, JPEG, atau PNG.',
-            'photo.max' => 'Ukuran foto maksimal 2MB.',
+            'photo.max' => 'Ukuran foto maksimal 5MB.',
         ]);
+
+        $allowedExtensions = ['jpg', 'jpeg', 'png', 'webp'];
+        $extension = strtolower($request->file('photo')->getClientOriginalExtension());
+        if (!in_array($extension, $allowedExtensions)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Format foto harus berupa JPG, JPEG, PNG, atau WEBP.',
+            ], 422);
+        }
 
         $user = $request->user();
         $profile = $user->candidateProfile ?? CandidateProfile::create([
@@ -136,13 +160,14 @@ class CandidateProfileController extends Controller
 
         $path = $request->file('photo')->store('candidate/photos', 'public');
         $profile->update(['photo' => $path]);
+        $freshProfile = $profile->fresh();
 
         return response()->json([
             'success' => true,
             'message' => 'Foto profil berhasil diunggah.',
             'data' => [
-                'photo' => $path,
-                'photo_url' => Storage::disk('public')->url($path),
+                'photo' => $freshProfile->photo,
+                'photo_url' => $freshProfile->photo_url,
             ],
         ]);
     }

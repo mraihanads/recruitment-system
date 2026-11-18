@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, Link, useNavigate } from 'react-router-dom';
+import { useParams, Link, useNavigate, useLocation } from 'react-router-dom';
+import { useAuth } from '../../context/AuthContext';
+import api from '../../services/api';
 import candidateService from '../../services/candidateService';
 import ApplyJobModal from '../../components/candidate/ApplyJobModal';
 import LoadingScreen from '../../components/common/LoadingScreen';
@@ -38,6 +40,18 @@ const formatDate = (dateString) => {
 const JobDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
+  const { isAuthenticated, role } = useAuth();
+  const isCandidateAuth = isAuthenticated && role === 'candidate';
+  const isNonCandidateAuth = isAuthenticated && (role === 'company' || role === 'admin');
+  const isPublicRoute = !location.pathname.startsWith('/candidate');
+
+  // If logged in as candidate but viewing public URL, redirect to candidate view
+  useEffect(() => {
+    if (isCandidateAuth && isPublicRoute) {
+      navigate(`/candidate/jobs/${id}`, { replace: true });
+    }
+  }, [isCandidateAuth, isPublicRoute, id, navigate]);
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -58,6 +72,17 @@ const JobDetail = () => {
     setLoading(true);
     setError(null);
     try {
+      if (!isCandidateAuth) {
+        const res = await api.get(`/public/jobs/${id}`);
+        if (res.data?.success) {
+          const data = res.data.data;
+          setJobData(data.job || data);
+        } else {
+          throw new Error(res.data?.message || 'Gagal memuat lowongan.');
+        }
+        return;
+      }
+
       const [detailRes, matchRes, profileRes] = await Promise.allSettled([
         candidateService.getJobDetail(id),
         candidateService.getJobMatch(id),
@@ -82,7 +107,7 @@ const JobDetail = () => {
         setCandidateProfile(profileRes.value.data);
       }
     } catch (err) {
-      setError(err.message || 'Gagal memuat detail lowongan kerja.');
+      setError(err.response?.data?.message || err.message || 'Gagal memuat detail lowongan kerja.');
     } finally {
       setLoading(false);
     }
@@ -90,9 +115,13 @@ const JobDetail = () => {
 
   useEffect(() => {
     fetchData();
-  }, [id]);
+  }, [id, isCandidateAuth]);
 
   const handleToggleSave = async () => {
+    if (!isCandidateAuth) {
+      navigate('/login');
+      return;
+    }
     if (savingAction) return;
     setSavingAction(true);
     const prevState = isSaved;
@@ -175,12 +204,20 @@ const JobDetail = () => {
   const matchedSkills = requiredSkills.filter(s => s.matched);
   const missingSkills = requiredSkills.filter(s => !s.matched);
 
-  return (
+  const handleApplyClick = () => {
+    if (!isCandidateAuth) {
+      navigate('/login');
+      return;
+    }
+    setIsApplyModalOpen(true);
+  };
+
+  const detailContent = (
     <div className="space-y-6 pb-12">
       {/* Navigation Breadcrumb */}
       <div className="flex items-center justify-between">
         <Link
-          to="/candidate/jobs"
+          to={isCandidateAuth ? '/candidate/jobs' : '/jobs'}
           className="inline-flex items-center gap-2 text-xs font-bold text-slate-500 hover:text-blue-600 transition-colors"
         >
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -306,62 +343,78 @@ const JobDetail = () => {
 
           {/* Action Button Strip */}
           <div className="flex items-center gap-3 w-full sm:w-auto shrink-0">
-            {/* Save / Unsave Button */}
-            <button
-              type="button"
-              onClick={handleToggleSave}
-              disabled={savingAction}
-              className={`p-3 rounded-2xl border transition-all flex items-center justify-center shrink-0 ${
-                isSaved
-                  ? 'bg-amber-50 text-amber-600 border-amber-200 hover:bg-amber-100'
-                  : 'bg-white text-slate-500 border-slate-200 hover:bg-slate-50 hover:text-slate-700'
-              }`}
-              title={isSaved ? 'Hapus Simpanan' : 'Simpan Lowongan'}
-              data-testid="jobdetail-save-btn"
-            >
-              <svg
-                className={`w-5 h-5 ${isSaved ? 'fill-current' : 'none'}`}
-                fill={isSaved ? 'currentColor' : 'none'}
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
-              </svg>
-            </button>
-
-            {/* Apply Button */}
-            {hasApplied ? (
+            {isNonCandidateAuth ? (
               <button
                 type="button"
                 disabled
-                className="w-full sm:w-auto px-6 py-3 rounded-2xl bg-emerald-50 text-emerald-700 border border-emerald-200 font-bold text-xs flex items-center justify-center gap-2 cursor-default"
-                data-testid="jobdetail-applied-badge"
-              >
-                <svg className="w-4 h-4 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
-                </svg>
-                Sudah Melamar
-              </button>
-            ) : isClosed ? (
-              <button
-                type="button"
-                disabled
-                className="w-full sm:w-auto px-6 py-3 rounded-2xl bg-slate-100 text-slate-400 font-bold text-xs cursor-not-allowed"
-              >
-                Lowongan Ditutup
-              </button>
-            ) : (
-              <button
-                type="button"
-                onClick={() => setIsApplyModalOpen(true)}
-                className="w-full sm:w-auto px-6 py-3 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-md shadow-blue-500/20 active:scale-95 transition-all flex items-center justify-center gap-2"
-                data-testid="jobdetail-apply-btn"
+                title="Perusahaan dan Administrator tidak dapat melamar pekerjaan"
+                className="w-full sm:w-auto px-5 py-3 rounded-2xl bg-slate-100 text-slate-400 border border-slate-200 font-bold text-xs cursor-not-allowed flex items-center justify-center gap-2"
               >
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
                 </svg>
-                Lamar Sekarang (Apply Now)
+                Hanya Kandidat yang Dapat Melamar
               </button>
+            ) : (
+              <>
+                {/* Save / Unsave Button */}
+                <button
+                  type="button"
+                  onClick={handleToggleSave}
+                  disabled={savingAction}
+                  className={`p-3 rounded-2xl border transition-all flex items-center justify-center shrink-0 ${
+                    isSaved
+                      ? 'bg-amber-50 text-amber-600 border-amber-200 hover:bg-amber-100'
+                      : 'bg-white text-slate-500 border-slate-200 hover:bg-slate-50 hover:text-slate-700'
+                  }`}
+                  title={isSaved ? 'Hapus Simpanan' : 'Simpan Lowongan'}
+                  data-testid="jobdetail-save-btn"
+                >
+                  <svg
+                    className={`w-5 h-5 ${isSaved ? 'fill-current' : 'none'}`}
+                    fill={isSaved ? 'currentColor' : 'none'}
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+                  </svg>
+                </button>
+
+                {/* Apply Button */}
+                {hasApplied ? (
+                  <button
+                    type="button"
+                    disabled
+                    className="w-full sm:w-auto px-6 py-3 rounded-2xl bg-emerald-50 text-emerald-700 border border-emerald-200 font-bold text-xs flex items-center justify-center gap-2 cursor-default"
+                    data-testid="jobdetail-applied-badge"
+                  >
+                    <svg className="w-4 h-4 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                    </svg>
+                    Sudah Melamar
+                  </button>
+                ) : isClosed ? (
+                  <button
+                    type="button"
+                    disabled
+                    className="w-full sm:w-auto px-6 py-3 rounded-2xl bg-slate-100 text-slate-400 font-bold text-xs cursor-not-allowed"
+                  >
+                    Lowongan Ditutup
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={handleApplyClick}
+                    className="w-full sm:w-auto px-6 py-3 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-md shadow-blue-500/20 active:scale-95 transition-all flex items-center justify-center gap-2"
+                    data-testid="jobdetail-apply-btn"
+                  >
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                    </svg>
+                    Lamar Sekarang (Apply Now)
+                  </button>
+                )}
+              </>
             )}
           </div>
         </div>
@@ -533,12 +586,18 @@ const JobDetail = () => {
 
             {/* Profile Skill Upgrade prompt */}
             <div className="mt-5 pt-4 border-t border-slate-100">
-              <Link
-                to="/candidate/profile/skills"
-                className="text-xs font-bold text-blue-600 hover:text-blue-700 inline-flex items-center gap-1"
-              >
-                Kelola Keterampilan Profil Saya &rarr;
-              </Link>
+              {isNonCandidateAuth ? (
+                <span className="text-xs text-slate-400 italic">
+                  Fitur pencocokan skill & lamaran hanya untuk akun Kandidat.
+                </span>
+              ) : (
+                <Link
+                  to={isCandidateAuth ? '/candidate/profile/skills' : '/login'}
+                  className="text-xs font-bold text-blue-600 hover:text-blue-700 inline-flex items-center gap-1"
+                >
+                  {isCandidateAuth ? 'Kelola Keterampilan Profil Saya →' : 'Login untuk Cek Kecocokan Skill Anda →'}
+                </Link>
+              )}
             </div>
           </div>
 
@@ -581,14 +640,80 @@ const JobDetail = () => {
       </div>
 
       {/* Apply Modal */}
-      <ApplyJobModal
-        isOpen={isApplyModalOpen}
-        onClose={() => setIsApplyModalOpen(false)}
-        job={jobData}
-        matchData={matchData}
-        candidateProfile={candidateProfile}
-        onApplySuccess={handleApplySuccess}
-      />
+      {isCandidateAuth && (
+        <ApplyJobModal
+          isOpen={isApplyModalOpen}
+          onClose={() => setIsApplyModalOpen(false)}
+          job={jobData}
+          matchData={matchData}
+          candidateProfile={candidateProfile}
+          onApplySuccess={handleApplySuccess}
+        />
+      )}
+    </div>
+  );
+
+  if (!isPublicRoute) {
+    return detailContent;
+  }
+
+  return (
+    <div className="min-h-screen bg-slate-50 flex flex-col font-sans text-slate-800">
+      <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-slate-200 px-6 sm:px-10 py-3.5 flex items-center justify-between shadow-xs">
+        <Link to="/" className="flex items-center gap-3 group">
+          <img
+            src="/logo.png"
+            alt="JobConnect"
+            className="w-10 h-10 rounded-xl object-contain shadow-md shadow-blue-500/20 group-hover:scale-105 transition-transform"
+          />
+          <div className="flex flex-col">
+            <span className="font-extrabold text-slate-900 text-lg tracking-tight leading-none">JobConnect</span>
+            <span className="text-[10px] font-semibold text-blue-600 tracking-wider uppercase mt-0.5">Talent Matching</span>
+          </div>
+        </Link>
+
+        <nav className="flex items-center gap-3">
+          <Link
+            to="/"
+            className="px-3.5 py-2 text-xs sm:text-sm font-semibold text-slate-600 hover:text-slate-900 transition-colors"
+          >
+            Beranda
+          </Link>
+          <Link
+            to="/jobs"
+            className="px-3.5 py-2 text-xs sm:text-sm font-semibold text-slate-600 hover:text-slate-900 transition-colors"
+          >
+            Lowongan
+          </Link>
+          {isAuthenticated ? (
+            <Link
+              to={role === 'admin' ? '/admin/dashboard' : role === 'company' ? '/company/dashboard' : '/candidate/dashboard'}
+              className="px-4 py-2 text-xs sm:text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 rounded-xl shadow-xs transition-all"
+            >
+              Ke Dashboard &rarr;
+            </Link>
+          ) : (
+            <>
+              <Link
+                to="/login"
+                className="px-3.5 py-2 text-xs sm:text-sm font-semibold text-slate-700 hover:text-blue-600 transition-colors"
+              >
+                Masuk
+              </Link>
+              <Link
+                to="/register"
+                className="px-4 py-2 text-xs sm:text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 rounded-xl shadow-xs transition-all"
+              >
+                Daftar
+              </Link>
+            </>
+          )}
+        </nav>
+      </header>
+
+      <main className="flex-1 max-w-6xl mx-auto w-full px-6 sm:px-10 py-8 sm:py-10">
+        {detailContent}
+      </main>
     </div>
   );
 };

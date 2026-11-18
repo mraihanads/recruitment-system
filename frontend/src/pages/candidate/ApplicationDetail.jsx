@@ -301,19 +301,45 @@ const ApplicationDetail = () => {
             </div>
           </div>
 
-          {/* Card 2: Cover Letter (Requirement 11) */}
+          {/* Card 2: Cover Letter / Requirements Documents (Requirement 11) */}
           <div className="bg-white rounded-3xl border border-slate-200/80 p-6 sm:p-7 shadow-xs">
             <h2 className="text-base font-bold text-slate-900 mb-3 flex items-center gap-2.5">
               <span className="w-2 h-5 rounded-full bg-indigo-600"></span>
-              Surat Lamaran (Cover Letter)
+              Surat Lamaran & Berkas Persyaratan ({application.cover_letter_files?.length || (application.cover_letter ? 1 : 0)})
             </h2>
-            {application.cover_letter ? (
+            {application.cover_letter_files && application.cover_letter_files.length > 0 ? (
+              <div className="space-y-2.5">
+                {application.cover_letter_files.map((fileItem, idx) => (
+                  <div key={idx} className="p-4 rounded-2xl bg-indigo-50/60 border border-indigo-100 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                    <div className="flex items-center gap-3 min-w-0">
+                      <div className="w-10 h-10 rounded-xl bg-indigo-600 text-white flex items-center justify-center font-bold text-xs shrink-0">
+                        #{idx + 1}
+                      </div>
+                      <div className="min-w-0">
+                        <p className="text-xs sm:text-sm font-bold text-slate-900 truncate" title={fileItem.name}>
+                          {fileItem.name}
+                        </p>
+                        <p className="text-[11px] text-indigo-700">Berkas Surat Lamaran & Persyaratan Terlampir</p>
+                      </div>
+                    </div>
+                    <a
+                      href={fileItem.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="px-4 py-2 rounded-xl text-xs font-bold bg-indigo-600 hover:bg-indigo-700 text-white shadow-xs transition-colors shrink-0"
+                    >
+                      Lihat / Unduh Berkas ↗
+                    </a>
+                  </div>
+                ))}
+              </div>
+            ) : application.cover_letter ? (
               <div className="p-4 rounded-2xl bg-slate-50 border border-slate-100 text-xs sm:text-sm text-slate-700 leading-relaxed whitespace-pre-line">
                 {application.cover_letter}
               </div>
             ) : (
               <p className="text-xs text-slate-400 italic">
-                Cover letter tidak disertakan saat pengiriman lamaran.
+                Berkas surat lamaran tidak disertakan saat pengiriman lamaran.
               </p>
             )}
           </div>

@@ -180,7 +180,11 @@ export const candidateService = {
   },
 
   async applyJob(id, data = {}) {
-    const res = await api.post(`/jobs/${id}/apply`, data);
+    const config =
+      data instanceof FormData
+        ? { headers: { 'Content-Type': 'multipart/form-data' } }
+        : {};
+    const res = await api.post(`/jobs/${id}/apply`, data, config);
     return res.data;
   },
 

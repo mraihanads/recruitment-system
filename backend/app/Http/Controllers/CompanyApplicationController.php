@@ -116,6 +116,12 @@ class CompanyApplicationController extends Controller
         }
 
         $cand = $application->candidateProfile;
+        $effectiveCvFile = $application->cv_file ?: ($cand ? $cand->cv_file : null);
+        $effectiveCvUrl = $effectiveCvFile
+            ? (str_starts_with($effectiveCvFile, 'http')
+                ? $effectiveCvFile
+                : 'http://127.0.0.1:8000/storage/' . ltrim(preg_replace('/^public\//', '', $effectiveCvFile), '/'))
+            : null;
 
         return response()->json([
             'success' => true,
@@ -126,8 +132,10 @@ class CompanyApplicationController extends Controller
                     'status' => $application->status,
                     'match_percentage' => (float) $application->match_percentage,
                     'cover_letter' => $application->cover_letter,
-                    'cv_file' => $application->cv_file,
-                    'cv_url' => $application->cv_file ? Storage::disk('public')->url($application->cv_file) : null,
+                    'cover_letter_url' => $application->cover_letter_url,
+                    'cover_letter_files' => $application->cover_letter_files,
+                    'cv_file' => $effectiveCvFile,
+                    'cv_url' => $effectiveCvUrl,
                     'applied_at' => $application->applied_at,
                     'status_histories' => $application->statusHistories,
                     'interviews' => $application->interviews,
@@ -141,15 +149,13 @@ class CompanyApplicationController extends Controller
                 'candidate' => $cand ? [
                     'id' => $cand->id,
                     'full_name' => $cand->full_name,
+                    'email' => $cand->user?->email,
                     'phone' => $cand->phone,
                     'gender' => $cand->gender,
                     'birth_date' => $cand->birth_date,
                     'address' => $cand->address,
                     'bio' => $cand->bio,
-                    'photo_url' => $cand->photo ? Storage::disk('public')->url($cand->photo) : null,
-                    'educations' => $cand->educations,
-                    'experiences' => $cand->experiences,
-                    'portfolios' => $cand->portfolios,
+                    'photo_url' => $cand->photo_url,
                     'skills' => $cand->skills,
                 ] : null,
             ],

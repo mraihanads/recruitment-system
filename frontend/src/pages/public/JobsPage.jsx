@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { Link, Navigate } from 'react-router-dom';
+import { Link, Navigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import EmptyState from '../../components/common/EmptyState';
 import api from '../../services/api';
@@ -43,11 +43,12 @@ const JobsPage = () => {
     return <Navigate to="/candidate/jobs" replace />;
   }
 
+  const [searchParams] = useSearchParams();
   const [jobs, setJobs] = useState([]);
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('');
+  const [searchTerm, setSearchTerm] = useState(() => searchParams.get('search') || '');
+  const [selectedCategory, setSelectedCategory] = useState(() => searchParams.get('category') || '');
   const [selectedType, setSelectedType] = useState('');
 
   useEffect(() => {
@@ -138,18 +139,29 @@ const JobsPage = () => {
           >
             Beranda
           </Link>
-          <Link
-            to="/login"
-            className="px-3.5 py-2 text-xs sm:text-sm font-semibold text-slate-700 hover:text-blue-600 transition-colors"
-          >
-            Masuk
-          </Link>
-          <Link
-            to="/register"
-            className="px-4 py-2 text-xs sm:text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 rounded-xl shadow-xs transition-all"
-          >
-            Daftar
-          </Link>
+          {isAuthenticated ? (
+            <Link
+              to={role === 'admin' ? '/admin/dashboard' : role === 'company' ? '/company/dashboard' : '/candidate/dashboard'}
+              className="px-4 py-2 text-xs sm:text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 rounded-xl shadow-xs transition-all"
+            >
+              Ke Dashboard &rarr;
+            </Link>
+          ) : (
+            <>
+              <Link
+                to="/login"
+                className="px-3.5 py-2 text-xs sm:text-sm font-semibold text-slate-700 hover:text-blue-600 transition-colors"
+              >
+                Masuk
+              </Link>
+              <Link
+                to="/register"
+                className="px-4 py-2 text-xs sm:text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 rounded-xl shadow-xs transition-all"
+              >
+                Daftar
+              </Link>
+            </>
+          )}
         </nav>
       </header>
 
@@ -282,9 +294,12 @@ const JobsPage = () => {
                     </span>
                   </div>
 
-                  <h3 className="text-base font-bold text-slate-900 mb-1 group-hover:text-blue-600 transition-colors">
+                  <Link
+                    to={`/jobs/${job.id}`}
+                    className="text-base font-bold text-slate-900 mb-1 group-hover:text-blue-600 transition-colors block"
+                  >
                     {job.title}
-                  </h3>
+                  </Link>
                   <p className="text-xs font-semibold text-slate-500 mb-3">
                     {job.company?.company_name || 'Perusahaan Terverifikasi'}
                   </p>
@@ -330,10 +345,10 @@ const JobsPage = () => {
 
                 <div className="pt-3 border-t border-slate-100 flex items-center justify-between">
                   <Link
-                    to="/login"
+                    to={`/jobs/${job.id}`}
                     className="w-full text-center py-2 px-3 rounded-xl bg-blue-50 hover:bg-blue-600 hover:text-white text-blue-700 text-xs font-bold transition-all"
                   >
-                    Login untuk Melamar & Cek Match &rarr;
+                    {isAuthenticated && (role === 'company' || role === 'admin') ? 'Lihat Detail →' : 'Detail & Lamar →'}
                   </Link>
                 </div>
               </div>

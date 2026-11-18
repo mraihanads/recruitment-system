@@ -23,7 +23,7 @@ class JobController extends Controller
 
     protected function getCandidate(Request $request)
     {
-        return $request->user()->candidateProfile;
+        return $request->user()?->candidateProfile;
     }
 
     /**
@@ -91,7 +91,7 @@ class JobController extends Controller
             'skills:id,name',
         ])->find($id);
 
-        if (!$job) {
+        if (!$job || $job->is_removed_by_admin) {
             return response()->json([
                 'success' => false,
                 'message' => 'Lowongan kerja tidak ditemukan.',
@@ -136,7 +136,7 @@ class JobController extends Controller
     public function match(Request $request, $id): JsonResponse
     {
         $job = JobVacancy::find($id);
-        if (!$job) {
+        if (!$job || $job->is_removed_by_admin) {
             return response()->json([
                 'success' => false,
                 'message' => 'Lowongan kerja tidak ditemukan.',
@@ -166,7 +166,7 @@ class JobController extends Controller
     public function apply(Request $request, $id): JsonResponse
     {
         $job = JobVacancy::find($id);
-        if (!$job) {
+        if (!$job || $job->is_removed_by_admin) {
             return response()->json([
                 'success' => false,
                 'message' => 'Lowongan kerja tidak ditemukan.',
@@ -195,6 +195,21 @@ class JobController extends Controller
             ], 422);
         }
 
+        $missingFields = [];
+        if (empty(trim((string) $candidate->full_name))) $missingFields[] = 'Nama Lengkap';
+        if (empty(trim((string) $candidate->phone))) $missingFields[] = 'Nomor Telepon';
+        if (empty(trim((string) $candidate->gender))) $missingFields[] = 'Jenis Kelamin';
+        if (empty($candidate->birth_date)) $missingFields[] = 'Tanggal Lahir';
+        if (empty(trim((string) $candidate->address))) $missingFields[] = 'Alamat Domisili';
+        if (empty(trim((string) $candidate->bio))) $missingFields[] = 'Ringkasan Profil (Bio)';
+
+        if (!empty($missingFields)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Biodata Anda belum lengkap (' . implode(', ', $missingFields) . '). Silakan lengkapi biodata terlebih dahulu di menu Profil sebelum melamar.',
+            ], 422);
+        }
+
         if (empty($candidate->cv_file)) {
             return response()->json([
                 'success' => false,
@@ -214,18 +229,67 @@ class JobController extends Controller
             ], 422);
         }
 
-        $request->validate([
-            'cover_letter' => ['nullable', 'string'],
-        ]);
+        $uploadedFiles = [];
+        if ($request->hasFile('cover_letter_files')) {
+            $rawFiles = $request->file('cover_letter_files');
+            $uploadedFiles = is_array($rawFiles) ? $rawFiles : [$rawFiles];
+        } elseif ($request->hasFile('cover_letter_file')) {
+            $uploadedFiles = [$request->file('cover_letter_file')];
+        }
+
+        if (empty($uploadedFiles)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Silakan unggah minimal 1 berkas Surat Lamaran / Dokumen Persyaratan yang diminta perusahaan.',
+            ], 422);
+        }
+
+        $allowedExtensions = ['pdf', 'doc', 'docx', 'jpg', 'jpeg', 'png', 'zip'];
+        $storedPaths = [];
+
+        foreach ($uploadedFiles as $idx => $uploadedFile) {
+            if (!$uploadedFile || !$uploadedFile->isValid()) {
+                continue;
+            }
+
+            if ($uploadedFile->getSize() > 10 * 1024 * 1024) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Ukuran setiap berkas maksimal 10MB.',
+                ], 422);
+            }
+
+            $extension = strtolower($uploadedFile->getClientOriginalExtension());
+            if (!in_array($extension, $allowedExtensions)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Format berkas harus berupa PDF, DOC, DOCX, JPG, PNG, atau ZIP.',
+                ], 422);
+            }
+
+            $originalName = $uploadedFile->getClientOriginalName();
+            $safeOriginalName = preg_replace('/[^A-Za-z0-9._\- ()]/', '_', basename($originalName));
+            if (empty($safeOriginalName)) {
+                $safeOriginalName = 'Berkas_Lamaran_' . ($idx + 1) . '.' . $extension;
+            }
+
+            $storedPaths[] = $uploadedFile->storeAs(
+                "candidate/cover_letters/{$candidate->id}/{$job->id}",
+                $safeOriginalName,
+                'public'
+            );
+        }
+
+        $coverLetterValue = count($storedPaths) === 1 ? $storedPaths[0] : json_encode($storedPaths);
 
         $matchResult = $this->matchingService->calculate($candidate, $job);
 
-        return DB::transaction(function () use ($job, $candidate, $request, $matchResult) {
+        return DB::transaction(function () use ($job, $candidate, $request, $matchResult, $coverLetterValue) {
             $application = Application::create([
                 'job_id' => $job->id,
                 'candidate_id' => $candidate->id,
                 'cv_file' => $candidate->cv_file,
-                'cover_letter' => $request->cover_letter,
+                'cover_letter' => $coverLetterValue,
                 'status' => 'submitted',
                 'match_percentage' => $matchResult['match_percentage'],
                 'applied_at' => Carbon::now(),
@@ -282,6 +346,39 @@ class JobController extends Controller
             'success' => true,
             'message' => 'Daftar kategori pekerjaan berhasil diambil.',
             'data' => $categories,
+        ]);
+    }
+
+    /**
+     * Get real-time public platform statistics from the database.
+     */
+    public function publicStats(): JsonResponse
+    {
+        if (JobCategory::count() === 0) {
+            $this->categories();
+        }
+
+        $activeJobsCount = JobVacancy::where('status', 'active')
+            ->where(function ($q) {
+                $q->where('is_removed_by_admin', false)->orWhereNull('is_removed_by_admin');
+            })
+            ->whereDate('deadline', '>=', Carbon::today())
+            ->count();
+
+        $verifiedCompaniesCount = \App\Models\Company::where('verification_status', 'verified')->count();
+        $totalCandidatesCount = \App\Models\User::where('role', 'candidate')->where('status', 'active')->count();
+        $categoriesCount = JobCategory::count();
+        $skillsCount = \App\Models\Skill::count();
+
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'active_jobs' => $activeJobsCount,
+                'verified_companies' => $verifiedCompaniesCount,
+                'total_candidates' => $totalCandidatesCount,
+                'total_categories' => $categoriesCount,
+                'total_skills' => $skillsCount,
+            ],
         ]);
     }
 }

@@ -68,6 +68,7 @@ const AppRoutes = () => {
           ========================================= */}
       <Route path="/" element={<LandingPage />} />
       <Route path="/jobs" element={<JobsPage />} />
+      <Route path="/jobs/:id" element={<JobDetail />} />
 
       {/* Guest-only routes */}
       <Route
@@ -166,17 +167,17 @@ const AppRoutes = () => {
         <Route index element={<Navigate to="dashboard" replace />} />
         <Route path="dashboard" element={<CandidateDashboard />} />
 
-        {/* Candidate Profile Modules (STEP 14A) */}
+        {/* Candidate Profile Modules (Biodata, CV & Skills) */}
         <Route path="profile" element={<CandidateProfile />} />
-        <Route path="profile/education" element={<CandidateEducation />} />
-        <Route path="profile/experience" element={<CandidateExperience />} />
-        <Route path="profile/portfolio" element={<CandidatePortfolio />} />
         <Route path="profile/skills" element={<CandidateSkills />} />
+        <Route path="profile/education" element={<Navigate to="/candidate/profile" replace />} />
+        <Route path="profile/experience" element={<Navigate to="/candidate/profile" replace />} />
+        <Route path="profile/portfolio" element={<Navigate to="/candidate/profile" replace />} />
 
         {/* Sub-route aliases */}
-        <Route path="education" element={<Navigate to="profile/education" replace />} />
-        <Route path="experience" element={<Navigate to="profile/experience" replace />} />
-        <Route path="portfolio" element={<Navigate to="profile/portfolio" replace />} />
+        <Route path="education" element={<Navigate to="/candidate/profile" replace />} />
+        <Route path="experience" element={<Navigate to="/candidate/profile" replace />} />
+        <Route path="portfolio" element={<Navigate to="/candidate/profile" replace />} />
         <Route path="skills" element={<Navigate to="profile/skills" replace />} />
 
         {/* Candidate Jobs & Application (STEP 14B) */}
