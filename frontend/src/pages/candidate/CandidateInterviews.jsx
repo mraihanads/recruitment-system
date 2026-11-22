@@ -65,15 +65,20 @@ const CandidateInterviews = () => {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+    <div className="space-y-6 pb-12">
+      <div className="bg-white rounded-xl border border-slate-200/90 p-6 sm:p-7 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Jadwal Wawancara</h1>
-          <p className="text-sm text-slate-500 mt-1">
+          <span className="text-xs font-mono uppercase tracking-wider text-blue-700 font-semibold block mb-1.5">
+            Agenda Seleksi
+          </span>
+          <h1 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight mb-1">
+            Jadwal Wawancara
+          </h1>
+          <p className="text-xs sm:text-sm text-slate-500">
             Pantau jadwal dan informasi sesi interview yang diundang oleh perusahaan.
           </p>
         </div>
-        <div className="text-xs font-semibold px-3 py-1.5 bg-blue-50 text-blue-700 rounded-full border border-blue-200 self-start sm:self-auto">
+        <div className="text-xs font-semibold px-3 py-1.5 bg-slate-100 text-slate-700 rounded-lg border border-slate-200/80 self-start sm:self-auto shrink-0">
           {interviews.length} Wawancara Terdaftar
         </div>
       </div>
@@ -81,24 +86,30 @@ const CandidateInterviews = () => {
       <div className="flex items-center gap-2 border-b border-slate-200 pb-3">
         <button
           onClick={() => setFilter('all')}
-          className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition ${
-            filter === 'all' ? 'bg-blue-600 text-white' : 'text-slate-600 hover:bg-slate-100'
+          className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-colors ${
+            filter === 'all'
+              ? 'bg-slate-900 text-white'
+              : 'text-slate-600 bg-white border border-slate-200/80 hover:bg-slate-100'
           }`}
         >
           Semua ({interviews.length})
         </button>
         <button
           onClick={() => setFilter('scheduled')}
-          className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition ${
-            filter === 'scheduled' ? 'bg-blue-600 text-white' : 'text-slate-600 hover:bg-slate-100'
+          className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-colors ${
+            filter === 'scheduled'
+              ? 'bg-slate-900 text-white'
+              : 'text-slate-600 bg-white border border-slate-200/80 hover:bg-slate-100'
           }`}
         >
           Akan Datang ({interviews.filter((i) => i.status === 'scheduled').length})
         </button>
         <button
           onClick={() => setFilter('completed')}
-          className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition ${
-            filter === 'completed' ? 'bg-blue-600 text-white' : 'text-slate-600 hover:bg-slate-100'
+          className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-colors ${
+            filter === 'completed'
+              ? 'bg-slate-900 text-white'
+              : 'text-slate-600 bg-white border border-slate-200/80 hover:bg-slate-100'
           }`}
         >
           Selesai ({interviews.filter((i) => i.status === 'completed').length})
@@ -110,11 +121,11 @@ const CandidateInterviews = () => {
           <LoadingScreen message="Memuat jadwal wawancara Anda..." />
         </div>
       ) : error ? (
-        <div className="p-8 bg-white rounded-2xl border border-slate-200">
+        <div className="p-8 bg-white rounded-xl border border-slate-200/90">
           <ErrorState message={error} onRetry={fetchInterviews} />
         </div>
       ) : filteredInterviews.length === 0 ? (
-        <div className="p-8 bg-white rounded-2xl border border-slate-200">
+        <div className="p-8 bg-white rounded-xl border border-slate-200/90">
           <EmptyState
             title="Tidak Ada Jadwal Wawancara"
             message={
@@ -132,7 +143,7 @@ const CandidateInterviews = () => {
             return (
               <div
                 key={item.id}
-                className="bg-white rounded-2xl border border-slate-200 p-5 shadow-xs hover:shadow-md transition flex flex-col justify-between"
+                className="bg-white rounded-xl border border-slate-200/90 p-5 hover:border-slate-300 transition flex flex-col justify-between"
               >
                 <div>
                   <div className="flex items-start justify-between gap-3 mb-3">

@@ -31,7 +31,7 @@ const ApplicationCard = ({ application }) => {
 
   return (
     <div
-      className="bg-white rounded-2xl border border-slate-200/80 p-5 sm:p-6 shadow-xs hover:shadow-md hover:border-blue-200 transition-all flex flex-col justify-between group"
+      className="bg-white rounded-xl border border-slate-200/90 p-5 sm:p-6 hover:border-slate-300 transition-all flex flex-col justify-between group"
       data-testid={`application-card-${application.id}`}
     >
       <div>
@@ -42,10 +42,10 @@ const ApplicationCard = ({ application }) => {
               <img
                 src={company.logo}
                 alt={company.company_name}
-                className="w-12 h-12 rounded-xl object-cover border border-slate-100 shrink-0"
+                className="w-12 h-12 rounded-xl object-cover border border-slate-200 shrink-0"
               />
             ) : (
-              <div className="w-12 h-12 rounded-xl bg-blue-50 text-blue-600 font-bold flex items-center justify-center shrink-0 border border-blue-100 text-sm">
+              <div className="w-12 h-12 rounded-xl bg-slate-100 text-slate-700 font-bold flex items-center justify-center shrink-0 border border-slate-200 text-sm">
                 {company.company_name ? company.company_name[0].toUpperCase() : 'C'}
               </div>
             )}
@@ -55,7 +55,7 @@ const ApplicationCard = ({ application }) => {
               </p>
               <Link
                 to={`/candidate/applications/${application.id}`}
-                className="text-base font-bold text-slate-800 hover:text-blue-600 transition-colors line-clamp-1 group-hover:text-blue-600"
+                className="text-base font-bold text-slate-900 hover:text-blue-700 transition-colors line-clamp-1 group-hover:text-blue-700"
               >
                 {job.title || 'Lowongan Pekerjaan'}
               </Link>
@@ -133,7 +133,7 @@ const ApplicationCard = ({ application }) => {
 
         <Link
           to={`/candidate/applications/${application.id}`}
-          className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-bold text-blue-600 bg-blue-50 hover:bg-blue-600 hover:text-white rounded-xl transition-all shadow-2xs group/btn"
+          className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold text-white bg-slate-900 hover:bg-blue-700 rounded-lg transition-colors group/btn"
         >
           Lihat Detail
           <svg className="w-3.5 h-3.5 group-hover/btn:translate-x-0.5 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">

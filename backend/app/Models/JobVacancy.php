@@ -70,4 +70,14 @@ class JobVacancy extends Model
     {
         return $this->hasMany(SavedJob::class, 'job_id');
     }
+
+    /**
+     * Auto-close any active job vacancies whose deadline has already passed.
+     */
+    public static function autoCloseExpired(): int
+    {
+        return static::where('status', 'active')
+            ->whereDate('deadline', '<', \Illuminate\Support\Carbon::today())
+            ->update(['status' => 'closed']);
+    }
 }

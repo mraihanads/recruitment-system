@@ -26,6 +26,8 @@ class CompanyReportController extends Controller
      */
     public function index(Request $request): JsonResponse
     {
+        JobVacancy::autoCloseExpired();
+
         $company = $this->getCompany($request);
 
         if (!$company) {

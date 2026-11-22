@@ -57,11 +57,32 @@ class CandidateSkillController extends Controller
     }
 
     /**
-     * Attach a skill to the candidate's profile.
+     * Attach one or more skills to the candidate's profile.
      */
     public function store(Request $request): JsonResponse
     {
         $candidate = $this->getCandidate($request);
+
+        // Support both batch `skill_ids` (array) and single `skill_id` (int)
+        if ($request->has('skill_ids')) {
+            $validated = $request->validate([
+                'skill_ids' => ['required', 'array', 'min:1'],
+                'skill_ids.*' => ['integer', 'exists:skills,id'],
+            ], [
+                'skill_ids.required' => 'Pilih minimal satu keahlian.',
+                'skill_ids.min' => 'Pilih minimal satu keahlian.',
+                'skill_ids.*.exists' => 'Salah satu keahlian yang dipilih tidak terdaftar di sistem.',
+            ]);
+
+            $candidate->skills()->syncWithoutDetaching($validated['skill_ids']);
+            $updatedSkills = $candidate->skills()->orderBy('name')->get();
+
+            return response()->json([
+                'success' => true,
+                'message' => count($validated['skill_ids']) . ' keahlian berhasil ditambahkan ke profil Anda.',
+                'data' => $updatedSkills,
+            ], 201);
+        }
 
         $request->validate([
             'skill_id' => ['required', 'integer', 'exists:skills,id'],

@@ -153,7 +153,7 @@ const CandidateProfile = () => {
           !isEditing ? (
             <button
               onClick={() => setIsEditing(true)}
-              className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs rounded-xl shadow-xs transition-colors flex items-center gap-1.5"
+              className="px-4 py-2 bg-slate-900 hover:bg-blue-700 text-white font-semibold text-xs rounded-lg transition-colors flex items-center gap-1.5"
             >
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
@@ -166,7 +166,7 @@ const CandidateProfile = () => {
                 type="button"
                 onClick={handleCancel}
                 disabled={saving}
-                className="px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs rounded-xl transition-colors"
+                className="px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs rounded-lg transition-colors"
               >
                 Batal
               </button>
@@ -174,7 +174,7 @@ const CandidateProfile = () => {
                 type="button"
                 onClick={handleSubmit}
                 disabled={saving}
-                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs rounded-xl shadow-xs transition-colors flex items-center gap-1.5 disabled:opacity-50"
+                className="px-4 py-2 bg-slate-900 hover:bg-blue-700 text-white font-semibold text-xs rounded-lg transition-colors flex items-center gap-1.5 disabled:opacity-50"
               >
                 {saving ? 'Menyimpan...' : 'Simpan Perubahan'}
               </button>
@@ -356,14 +356,14 @@ const CandidateProfile = () => {
                 type="button"
                 onClick={handleCancel}
                 disabled={saving}
-                className="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs rounded-xl transition-colors"
+                className="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs rounded-lg transition-colors"
               >
                 Batal
               </button>
               <button
                 type="submit"
                 disabled={saving}
-                className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs rounded-xl shadow-xs transition-colors flex items-center gap-2 disabled:opacity-50"
+                className="px-5 py-2.5 bg-slate-900 hover:bg-blue-700 text-white font-semibold text-xs rounded-lg transition-colors flex items-center gap-2 disabled:opacity-50"
               >
                 {saving ? 'Menyimpan...' : 'Simpan Perubahan'}
               </button>

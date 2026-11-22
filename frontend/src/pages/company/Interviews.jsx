@@ -296,16 +296,16 @@ const Interviews = () => {
       )}
 
       {/* Header Banner */}
-      <div className="bg-white rounded-3xl border border-slate-200/80 p-6 sm:p-8 shadow-xs">
+      <div className="bg-white rounded-xl border border-slate-200/90 p-6 sm:p-7">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-          <div className="space-y-1.5">
-            <div className="flex items-center gap-2">
-              <span className="w-2.5 h-6 rounded-full bg-blue-600 inline-block" />
-              <h1 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
-                Manajemen Jadwal Interview
-              </h1>
-            </div>
-            <p className="text-xs sm:text-sm text-slate-500 max-w-2xl">
+          <div>
+            <span className="text-xs font-mono uppercase tracking-wider text-blue-700 font-semibold block mb-1.5">
+              Agenda Seleksi
+            </span>
+            <h1 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight mb-1">
+              Manajemen Jadwal Interview
+            </h1>
+            <p className="text-xs sm:text-sm text-slate-500 max-w-2xl leading-relaxed">
               Atur, jadwalkan, dan kelola sesi wawancara langsung bersama kandidat pelamar yang lolos seleksi berkas.
             </p>
           </div>
@@ -313,7 +313,7 @@ const Interviews = () => {
           <button
             type="button"
             onClick={handleOpenCreate}
-            className="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs sm:text-sm shadow-xs transition-all inline-flex items-center justify-center gap-2 self-start md:self-auto shrink-0"
+            className="px-4 py-2.5 rounded-lg bg-slate-900 hover:bg-blue-700 text-white font-semibold text-xs transition-colors inline-flex items-center justify-center gap-2 self-start md:self-auto shrink-0"
             data-testid="schedule-interview-btn"
           >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -325,35 +325,35 @@ const Interviews = () => {
 
         {/* Stats Grid */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 mt-6 pt-6 border-t border-slate-100">
-          <div className="bg-slate-50/70 p-3.5 sm:p-4 rounded-2xl border border-slate-100">
-            <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider block">
+          <div className="bg-slate-50/70 p-3.5 sm:p-4 rounded-xl border border-slate-200/80">
+            <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider block">
               Total Interview
             </span>
-            <span className="text-xl sm:text-2xl font-black text-slate-900 mt-0.5 block">
+            <span className="text-xl sm:text-2xl font-bold text-slate-900 mt-0.5 block">
               {stats.total}
             </span>
           </div>
-          <div className="bg-blue-50/50 p-3.5 sm:p-4 rounded-2xl border border-blue-100/60">
-            <span className="text-[11px] font-semibold text-blue-500 uppercase tracking-wider block">
+          <div className="bg-slate-50/70 p-3.5 sm:p-4 rounded-xl border border-slate-200/80">
+            <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider block">
               Dijadwalkan
             </span>
-            <span className="text-xl sm:text-2xl font-black text-blue-700 mt-0.5 block">
+            <span className="text-xl sm:text-2xl font-bold text-blue-700 mt-0.5 block">
               {stats.scheduled}
             </span>
           </div>
-          <div className="bg-emerald-50/50 p-3.5 sm:p-4 rounded-2xl border border-emerald-100/60">
-            <span className="text-[11px] font-semibold text-emerald-500 uppercase tracking-wider block">
+          <div className="bg-slate-50/70 p-3.5 sm:p-4 rounded-xl border border-slate-200/80">
+            <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider block">
               Selesai
             </span>
-            <span className="text-xl sm:text-2xl font-black text-emerald-700 mt-0.5 block">
+            <span className="text-xl sm:text-2xl font-bold text-emerald-700 mt-0.5 block">
               {stats.completed}
             </span>
           </div>
-          <div className="bg-rose-50/50 p-3.5 sm:p-4 rounded-2xl border border-rose-100/60">
-            <span className="text-[11px] font-semibold text-rose-500 uppercase tracking-wider block">
+          <div className="bg-slate-50/70 p-3.5 sm:p-4 rounded-xl border border-slate-200/80">
+            <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider block">
               Dibatalkan
             </span>
-            <span className="text-xl sm:text-2xl font-black text-rose-700 mt-0.5 block">
+            <span className="text-xl sm:text-2xl font-bold text-rose-700 mt-0.5 block">
               {stats.cancelled}
             </span>
           </div>
@@ -361,7 +361,7 @@ const Interviews = () => {
       </div>
 
       {/* Filter and Search Bar */}
-      <div className="bg-white rounded-3xl border border-slate-200/80 p-4 sm:p-5 shadow-xs space-y-4">
+      <div className="bg-white rounded-xl border border-slate-200/90 p-4 sm:p-5 space-y-4">
         <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
           {/* Search Input */}
           <div className="relative flex-1">
@@ -375,7 +375,7 @@ const Interviews = () => {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Cari kandidat, email, atau posisi lowongan..."
-              className="w-full pl-10 pr-4 py-2 text-xs sm:text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all"
+              className="w-full pl-10 pr-4 py-2 text-xs sm:text-sm bg-white border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 transition-all"
               data-testid="interview-search-input"
             />
           </div>
@@ -385,7 +385,7 @@ const Interviews = () => {
             <select
               value={methodFilter}
               onChange={(e) => setMethodFilter(e.target.value)}
-              className="px-3 py-2 text-xs font-semibold bg-slate-50 border border-slate-200 rounded-xl text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="px-3 py-2 text-xs font-semibold bg-white border border-slate-300 rounded-lg text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600"
               data-testid="method-filter-select"
             >
               <option value="all">Semua Metode</option>
@@ -409,17 +409,17 @@ const Interviews = () => {
                 key={tab.id}
                 type="button"
                 onClick={() => setStatusFilter(tab.id)}
-                className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap inline-flex items-center gap-1.5 ${
+                className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-colors whitespace-nowrap inline-flex items-center gap-1.5 ${
                   isActive
-                    ? 'bg-blue-600 text-white shadow-xs'
-                    : 'bg-slate-100/70 text-slate-600 hover:bg-slate-200/60'
+                    ? 'bg-slate-900 text-white'
+                    : 'bg-slate-100 text-slate-600 hover:bg-slate-200/80'
                 }`}
                 data-testid={`status-tab-${tab.id}`}
               >
                 <span>{tab.label}</span>
                 <span
-                  className={`px-1.5 py-0.2 rounded-md text-[10px] ${
-                    isActive ? 'bg-blue-700 text-white' : 'bg-slate-200 text-slate-700'
+                  className={`px-1.5 py-0.2 rounded text-[10px] ${
+                    isActive ? 'bg-white/20 text-white' : 'bg-slate-200 text-slate-700'
                   }`}
                 >
                   {tab.count}
@@ -450,7 +450,7 @@ const Interviews = () => {
             return (
               <div
                 key={iv.id}
-                className="bg-white rounded-3xl border border-slate-200/80 p-5 sm:p-6 shadow-xs hover:border-blue-200 hover:shadow-md transition-all flex flex-col justify-between"
+                className="bg-white rounded-xl border border-slate-200/90 p-5 sm:p-6 hover:border-slate-300 transition-all flex flex-col justify-between"
                 data-testid={`interview-card-${iv.id}`}
               >
                 <div className="space-y-4">
@@ -595,14 +595,14 @@ const Interviews = () => {
                     <button
                       type="button"
                       onClick={() => handleOpenEdit(iv)}
-                      className="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs transition-all"
+                      className="px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs transition-colors"
                       data-testid={`edit-interview-btn-${iv.id}`}
                     >
                       Edit
                     </button>
                     <Link
                       to={`/company/interviews/${iv.id}`}
-                      className="px-3.5 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-xs transition-all"
+                      className="px-3.5 py-1.5 rounded-lg bg-slate-900 hover:bg-blue-700 text-white font-semibold text-xs transition-colors"
                       data-testid={`detail-interview-btn-${iv.id}`}
                     >
                       Detail

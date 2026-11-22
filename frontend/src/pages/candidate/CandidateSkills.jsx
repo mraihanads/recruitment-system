@@ -12,8 +12,8 @@ const CandidateSkills = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Selector state
-  const [selectedSkillId, setSelectedSkillId] = useState('');
+  // Multi-selector state
+  const [selectedSkillIds, setSelectedSkillIds] = useState([]);
   const [searchFilter, setSearchFilter] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [removingId, setRemovingId] = useState(null);
@@ -44,40 +44,43 @@ const CandidateSkills = () => {
     fetchData();
   }, [fetchData]);
 
-  const handleAddSkill = async (e) => {
+  const toggleSelectSkill = (skillId) => {
+    setSelectedSkillIds((prev) =>
+      prev.includes(skillId)
+        ? prev.filter((id) => id !== skillId)
+        : [...prev, skillId]
+    );
+  };
+
+  const handleAddSkills = async (e) => {
     e.preventDefault();
     setFeedbackMessage({ type: '', text: '' });
 
-    if (!selectedSkillId) {
-      setFeedbackMessage({ type: 'error', text: 'Silakan pilih keahlian terlebih dahulu.' });
-      return;
-    }
-
-    const skillIdInt = parseInt(selectedSkillId, 10);
-    // Frontend duplicate check
-    const alreadyHas = candidateSkills.some((s) => s.id === skillIdInt);
-    if (alreadyHas) {
-      setFeedbackMessage({ type: 'error', text: 'Skill ini sudah ditambahkan ke profil Anda.' });
+    if (selectedSkillIds.length === 0) {
+      setFeedbackMessage({ type: 'error', text: 'Silakan pilih minimal satu keahlian terlebih dahulu.' });
       return;
     }
 
     setSubmitting(true);
     try {
-      await candidateService.addSkill(skillIdInt);
-      const addedSkill = masterSkills.find((s) => s.id === skillIdInt);
-      if (addedSkill) {
-        setCandidateSkills((prev) => [...prev, addedSkill]);
+      const res = await candidateService.addSkills(selectedSkillIds);
+      if (Array.isArray(res.data)) {
+        setCandidateSkills(res.data);
       } else {
-        fetchData();
+        await fetchData();
       }
-      setSelectedSkillId('');
+      const addedCount = selectedSkillIds.length;
+      setSelectedSkillIds([]);
       setSearchFilter('');
-      setFeedbackMessage({ type: 'success', text: `Skill "${addedSkill?.name || ''}" berhasil ditambahkan.` });
+      setFeedbackMessage({
+        type: 'success',
+        text: `${addedCount} keahlian berhasil ditambahkan ke profil Anda.`,
+      });
       setTimeout(() => setFeedbackMessage({ type: '', text: '' }), 4000);
     } catch (err) {
       setFeedbackMessage({
         type: 'error',
-        text: err.response?.data?.message || 'Gagal menambahkan skill.',
+        text: err.response?.data?.message || 'Gagal menambahkan keahlian.',
       });
     } finally {
       setSubmitting(false);
@@ -133,49 +136,101 @@ const CandidateSkills = () => {
       {/* Add Skill Box */}
       <SectionCard
         title="Tambah Keahlian Baru"
-        subtitle="Pilih keahlian teknis atau kompetensi dari daftar master skill sistem"
+        subtitle="Klik untuk memilih beberapa keahlian sekaligus dari daftar master skill, lalu tekan Simpan"
         className="mb-6"
       >
-        <form onSubmit={handleAddSkill} className="space-y-4">
-          <div className="flex flex-col sm:flex-row gap-3">
-            {/* Searchable Skill Selector */}
-            <div className="flex-1">
-              <select
-                id="skill-select"
-                value={selectedSkillId}
-                onChange={(e) => setSelectedSkillId(e.target.value)}
-                className="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-100 bg-white"
-              >
-                <option value="">-- Pilih Keahlian yang Anda Kuasai --</option>
-                {availableSkills.map((skill) => (
-                  <option key={skill.id} value={skill.id}>
-                    {skill.name}
-                  </option>
-                ))}
-              </select>
+        <form onSubmit={handleAddSkills} className="space-y-4">
+          {/* Search Filter & Selection Summary */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div className="relative flex-1">
+              <input
+                type="text"
+                value={searchFilter}
+                onChange={(e) => setSearchFilter(e.target.value)}
+                placeholder="Cari nama keahlian (contoh: React, PHP, Excel, Accounting)..."
+                className="w-full px-3.5 py-2 rounded-lg border border-slate-300 text-xs sm:text-sm text-slate-800 focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500/20 bg-white"
+              />
+              {searchFilter && (
+                <button
+                  type="button"
+                  onClick={() => setSearchFilter('')}
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600 text-sm"
+                >
+                  ✕
+                </button>
+              )}
             </div>
+
+            {selectedSkillIds.length > 0 && (
+              <div className="flex items-center gap-2 shrink-0">
+                <span className="text-xs font-semibold text-blue-700 bg-blue-50 border border-blue-200 px-2.5 py-1 rounded-md">
+                  {selectedSkillIds.length} keahlian dipilih
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setSelectedSkillIds([])}
+                  className="text-xs text-slate-500 hover:text-rose-600 font-medium underline"
+                >
+                  Reset Pilihan
+                </button>
+              </div>
+            )}
+          </div>
+
+          {/* Multi-select Skill Pills */}
+          {availableSkills.length === 0 ? (
+            <div className="p-4 rounded-xl bg-slate-50 border border-slate-200/80 text-center text-xs text-slate-500">
+              {searchFilter
+                ? `Tidak ada keahlian yang cocok dengan kata kunci "${searchFilter}".`
+                : 'Semua keahlian di sistem sudah Anda tambahkan ke profil.'}
+            </div>
+          ) : (
+            <div className="p-3.5 rounded-xl bg-slate-50/70 border border-slate-200/80 max-h-60 overflow-y-auto">
+              <div className="flex flex-wrap gap-2">
+                {availableSkills.map((skill) => {
+                  const isSelected = selectedSkillIds.includes(skill.id);
+                  return (
+                    <button
+                      key={skill.id}
+                      type="button"
+                      onClick={() => toggleSelectSkill(skill.id)}
+                      className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold border transition-all cursor-pointer ${
+                        isSelected
+                          ? 'bg-slate-900 text-white border-slate-900 shadow-2xs'
+                          : 'bg-white text-slate-700 border-slate-200 hover:border-slate-400 hover:bg-slate-100/70'
+                      }`}
+                    >
+                      <span>{isSelected ? '✓' : '+'}</span>
+                      <span>{skill.name}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-2 border-t border-slate-100">
+            <p className="text-xs text-slate-500">
+              Sistem menggunakan daftar keahlian Anda untuk menghitung persentase kecocokan dengan setiap lowongan kerja.
+            </p>
 
             <button
               type="submit"
-              disabled={submitting || !selectedSkillId}
-              className="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold text-sm rounded-xl shadow-xs transition-colors disabled:opacity-50 flex items-center justify-center gap-2 shrink-0"
+              disabled={submitting || selectedSkillIds.length === 0}
+              className="px-5 py-2.5 bg-slate-900 hover:bg-blue-700 text-white font-semibold text-xs sm:text-sm rounded-lg transition-colors disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2 shrink-0"
             >
               {submitting ? (
                 <>
                   <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                  <span>Menambahkan...</span>
+                  <span>Menyimpan...</span>
                 </>
               ) : (
-                <>
-                  <span>+ Tambah Skill</span>
-                </>
+                <span>
+                  + Simpan Keahlian Terpilih {selectedSkillIds.length > 0 ? `(${selectedSkillIds.length})` : ''}
+                </span>
               )}
             </button>
           </div>
-
-          <p className="text-xs text-slate-400">
-            💡 Sistem rekrutmen akan menggunakan keahlian ini untuk menghitung persentase kecocokan (*match percentage*) dengan lowongan kerja yang relevan.
-          </p>
         </form>
       </SectionCard>
 
@@ -191,22 +246,22 @@ const CandidateSkills = () => {
         ) : candidateSkills.length === 0 ? (
           <EmptyState
             title="Belum Ada Keahlian Ditambahkan"
-            description="Tambahkan keahlian Anda melalui form di atas untuk mengaktifkan fitur pencocokan lowongan otomatis."
+            description="Pilih satu atau beberapa keahlian di atas untuk mengaktifkan fitur pencocokan lowongan otomatis."
           />
         ) : (
-          <div className="flex flex-wrap gap-2.5">
+          <div className="flex flex-wrap gap-2">
             {candidateSkills.map((skill) => (
               <span
                 key={skill.id}
-                className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold bg-blue-50 text-blue-800 border border-blue-200/80 shadow-2xs hover:bg-blue-100 transition-colors"
+                className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-800 border border-slate-200/90 hover:bg-slate-200/70 transition-colors"
               >
-                <span>⚡ {skill.name}</span>
+                <span>{skill.name}</span>
                 <button
                   type="button"
                   onClick={() => handleRemoveSkill(skill.id, skill.name)}
                   disabled={removingId === skill.id}
                   title={`Hapus skill ${skill.name}`}
-                  className="w-4 h-4 rounded-full text-blue-400 hover:text-rose-600 flex items-center justify-center text-xs font-bold transition-colors disabled:opacity-50"
+                  className="w-4 h-4 rounded-full text-slate-400 hover:text-rose-600 flex items-center justify-center text-xs font-bold transition-colors disabled:opacity-50"
                 >
                   {removingId === skill.id ? '…' : '✕'}
                 </button>

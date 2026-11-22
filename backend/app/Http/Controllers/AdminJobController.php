@@ -28,6 +28,7 @@ class AdminJobController extends Controller
     public function index(Request $request): JsonResponse
     {
         $this->ensureModerationColumns();
+        JobVacancy::autoCloseExpired();
 
         $query = JobVacancy::with([
             'company:id,user_id,company_name,logo',

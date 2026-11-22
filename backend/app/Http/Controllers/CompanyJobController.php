@@ -20,6 +20,8 @@ class CompanyJobController extends Controller
      */
     public function index(Request $request): JsonResponse
     {
+        JobVacancy::autoCloseExpired();
+
         $company = $this->getCompany($request);
 
         if (!$company) {
@@ -114,6 +116,10 @@ class CompanyJobController extends Controller
         ]);
 
         return DB::transaction(function () use ($company, $validated) {
+            $deadlinePassed = \Illuminate\Support\Carbon::parse($validated['deadline'])->startOfDay()->lt(\Illuminate\Support\Carbon::today());
+            $requestedStatus = $validated['status'] ?? 'draft';
+            $finalStatus = ($requestedStatus === 'active' && $deadlinePassed) ? 'closed' : $requestedStatus;
+
             $job = $company->jobVacancies()->create([
                 'category_id' => $validated['category_id'],
                 'title' => $validated['title'],
@@ -128,7 +134,7 @@ class CompanyJobController extends Controller
                 'interview_start_date' => $validated['interview_start_date'] ?? null,
                 'interview_end_date' => $validated['interview_end_date'] ?? null,
                 'announcement_date' => $validated['announcement_date'] ?? null,
-                'status' => $validated['status'] ?? 'draft',
+                'status' => $finalStatus,
             ]);
 
             if (!empty($validated['skills'])) {
@@ -148,6 +154,8 @@ class CompanyJobController extends Controller
      */
     public function show(Request $request, $id): JsonResponse
     {
+        JobVacancy::autoCloseExpired();
+
         $company = $this->getCompany($request);
         $job = JobVacancy::with([
             'category:id,name,description',
@@ -242,6 +250,10 @@ class CompanyJobController extends Controller
         ]);
 
         return DB::transaction(function () use ($job, $validated) {
+            $deadlinePassed = \Illuminate\Support\Carbon::parse($validated['deadline'])->startOfDay()->lt(\Illuminate\Support\Carbon::today());
+            $requestedStatus = $validated['status'] ?? $job->status;
+            $finalStatus = ($requestedStatus === 'active' && $deadlinePassed) ? 'closed' : $requestedStatus;
+
             $job->update([
                 'category_id' => $validated['category_id'],
                 'title' => $validated['title'],
@@ -256,7 +268,7 @@ class CompanyJobController extends Controller
                 'interview_start_date' => $validated['interview_start_date'] ?? null,
                 'interview_end_date' => $validated['interview_end_date'] ?? null,
                 'announcement_date' => $validated['announcement_date'] ?? null,
-                'status' => $validated['status'] ?? $job->status,
+                'status' => $finalStatus,
             ]);
 
             if (isset($validated['skills'])) {
@@ -357,6 +369,13 @@ class CompanyJobController extends Controller
                 'success' => false,
                 'message' => 'Perusahaan belum terverifikasi. Lowongan tidak dapat diaktifkan sebelum admin menyetujui perusahaan Anda.',
             ], 403);
+        }
+
+        if ($validated['status'] === 'active' && $job->deadline && \Illuminate\Support\Carbon::parse($job->deadline)->startOfDay()->lt(\Illuminate\Support\Carbon::today())) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Batas waktu lamaran (deadline) sudah lewat. Silakan perpanjang tanggal deadline terlebih dahulu di menu Edit sebelum mengaktifkan lowongan ini.',
+            ], 422);
         }
 
         $job->update(['status' => $validated['status']]);

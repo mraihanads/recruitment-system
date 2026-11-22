@@ -108,22 +108,22 @@ const Reports = () => {
       {/* ========================================================
           1. HEADER & PERIOD FILTER
           ======================================================== */}
-      <div className="bg-white rounded-3xl border border-slate-200/80 p-6 sm:p-8 shadow-xs">
+      <div className="bg-white rounded-xl border border-slate-200/90 p-6 sm:p-7">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-          <div className="space-y-1.5">
-            <div className="flex items-center gap-2">
-              <span className="w-2.5 h-6 rounded-full bg-blue-600 inline-block" />
-              <h1 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
-                Laporan & Statistik Rekrutmen
-              </h1>
-            </div>
+          <div>
+            <span className="text-xs font-mono uppercase tracking-wider text-blue-700 font-semibold block mb-1.5">
+              Analitik Rekrutmen
+            </span>
+            <h1 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight mb-1">
+              Laporan & Statistik Rekrutmen
+            </h1>
             <p className="text-xs sm:text-sm text-slate-500 max-w-2xl leading-relaxed">
               Ringkasan performa lowongan kerja, konversi tahapan pelamar, dan efektivitas wawancara perusahaan Anda.
             </p>
           </div>
 
           {/* Period Filter Buttons */}
-          <div className="flex items-center gap-1.5 p-1 bg-slate-100 rounded-2xl self-start md:self-auto shrink-0" data-testid="report-period-filter">
+          <div className="flex items-center gap-1 p-1 bg-slate-100 rounded-xl self-start md:self-auto shrink-0" data-testid="report-period-filter">
             {[
               { id: 'all', label: 'Semua Waktu' },
               { id: 'month', label: 'Bulan Ini' },
@@ -137,9 +137,9 @@ const Reports = () => {
                   type="button"
                   onClick={() => handlePeriodChange(p.id)}
                   disabled={loading}
-                  className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all ${
+                  className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-colors ${
                     active
-                      ? 'bg-white text-blue-600 shadow-xs'
+                      ? 'bg-slate-900 text-white'
                       : 'text-slate-600 hover:text-slate-900'
                   }`}
                   data-testid={`period-filter-${p.id}`}
@@ -244,18 +244,17 @@ const Reports = () => {
               ======================================================== */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Left: Application Status Funnel Breakdown (2 Cols) */}
-            <div className="lg:col-span-2 bg-white rounded-3xl border border-slate-200/80 p-6 sm:p-7 shadow-xs space-y-6" data-testid="application-status-section">
+            <div className="lg:col-span-2 bg-white rounded-xl border border-slate-200/90 p-6 sm:p-7 space-y-6" data-testid="application-status-section">
               <div className="flex items-center justify-between pb-3 border-b border-slate-100">
                 <div>
-                  <h2 className="text-base font-bold text-slate-900 flex items-center gap-2">
-                    <span className="w-2.5 h-5 rounded-full bg-blue-600" />
+                  <h2 className="text-base font-bold text-slate-900">
                     Distribusi Status Lamaran
                   </h2>
-                  <p className="text-xs text-slate-400 mt-0.5">
+                  <p className="text-xs text-slate-500 mt-0.5">
                     Komposisi berkas kandidat di setiap tahapan rekrutmen
                   </p>
                 </div>
-                <span className="text-xs font-bold text-slate-500 bg-slate-100 px-3 py-1 rounded-xl">
+                <span className="text-xs font-semibold text-slate-600 bg-slate-100 px-3 py-1 rounded-lg">
                   Total: {stats.total_applications || 0} Pelamar
                 </span>
               </div>
@@ -292,7 +291,7 @@ const Reports = () => {
                   return (
                     <div
                       key={item.key}
-                      className="p-3.5 rounded-2xl bg-slate-50/80 border border-slate-100 flex items-center justify-between"
+                      className="p-3.5 rounded-xl bg-slate-50/80 border border-slate-200/70 flex items-center justify-between"
                     >
                       <div className="flex items-center gap-2.5">
                         <span className={`w-3 h-3 rounded-full ${cfg.color} shrink-0`} />
@@ -300,12 +299,12 @@ const Reports = () => {
                           <span className="text-xs font-bold text-slate-800 block">
                             {cfg.label}
                           </span>
-                          <span className="text-[11px] text-slate-400">
+                          <span className="text-[11px] text-slate-500">
                             {pct}% dari total
                           </span>
                         </div>
                       </div>
-                      <span className="text-base sm:text-lg font-black text-slate-900">
+                      <span className="text-base sm:text-lg font-bold text-slate-900">
                         {item.count}
                       </span>
                     </div>
@@ -315,18 +314,17 @@ const Reports = () => {
             </div>
 
             {/* Right: Interview Status Breakdown (1 Col) */}
-            <div className="bg-white rounded-3xl border border-slate-200/80 p-6 sm:p-7 shadow-xs space-y-6" data-testid="interview-status-section">
+            <div className="bg-white rounded-xl border border-slate-200/90 p-6 sm:p-7 space-y-6" data-testid="interview-status-section">
               <div className="flex items-center justify-between pb-3 border-b border-slate-100">
                 <div>
-                  <h2 className="text-base font-bold text-slate-900 flex items-center gap-2">
-                    <span className="w-2.5 h-5 rounded-full bg-purple-600" />
+                  <h2 className="text-base font-bold text-slate-900">
                     Statistik Wawancara
                   </h2>
-                  <p className="text-xs text-slate-400 mt-0.5">
+                  <p className="text-xs text-slate-500 mt-0.5">
                     Aktivitas & realisasi jadwal interview
                   </p>
                 </div>
-                <span className="text-xs font-bold text-purple-700 bg-purple-50 px-2.5 py-1 rounded-xl">
+                <span className="text-xs font-semibold text-slate-700 bg-slate-100 px-2.5 py-1 rounded-lg">
                   {ivStatus.total || 0} Sesi
                 </span>
               </div>
@@ -334,58 +332,58 @@ const Reports = () => {
               {/* Status items */}
               <div className="space-y-4">
                 {/* Scheduled */}
-                <div className="p-4 rounded-2xl bg-blue-50/50 border border-blue-100 space-y-2">
+                <div className="p-4 rounded-xl bg-slate-50/80 border border-slate-200/70 space-y-2">
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold text-blue-900 flex items-center gap-1.5">
+                    <span className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
                       <span className="w-2 h-2 rounded-full bg-blue-500" />
                       Dijadwalkan (Scheduled)
                     </span>
-                    <span className="text-base font-black text-blue-800">
+                    <span className="text-base font-bold text-blue-700">
                       {ivStatus.scheduled || 0}
                     </span>
                   </div>
-                  <div className="w-full h-2 rounded-full bg-blue-200/50 overflow-hidden">
+                  <div className="w-full h-2 rounded-full bg-slate-200 overflow-hidden">
                     <div className="h-full bg-blue-600 rounded-full" style={{ width: `${ivScheduledPct}%` }} />
                   </div>
-                  <span className="text-[11px] text-blue-600 font-semibold block text-right">
+                  <span className="text-[11px] text-slate-500 font-medium block text-right">
                     {ivScheduledPct}% dari total
                   </span>
                 </div>
 
                 {/* Completed */}
-                <div className="p-4 rounded-2xl bg-emerald-50/50 border border-emerald-100 space-y-2">
+                <div className="p-4 rounded-xl bg-slate-50/80 border border-slate-200/70 space-y-2">
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold text-emerald-900 flex items-center gap-1.5">
+                    <span className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
                       <span className="w-2 h-2 rounded-full bg-emerald-500" />
                       Selesai (Completed)
                     </span>
-                    <span className="text-base font-black text-emerald-800">
+                    <span className="text-base font-bold text-emerald-700">
                       {ivStatus.completed || 0}
                     </span>
                   </div>
-                  <div className="w-full h-2 rounded-full bg-emerald-200/50 overflow-hidden">
+                  <div className="w-full h-2 rounded-full bg-slate-200 overflow-hidden">
                     <div className="h-full bg-emerald-600 rounded-full" style={{ width: `${ivCompletedPct}%` }} />
                   </div>
-                  <span className="text-[11px] text-emerald-600 font-semibold block text-right">
+                  <span className="text-[11px] text-slate-500 font-medium block text-right">
                     {ivCompletedPct}% dari total
                   </span>
                 </div>
 
                 {/* Cancelled */}
-                <div className="p-4 rounded-2xl bg-rose-50/50 border border-rose-100 space-y-2">
+                <div className="p-4 rounded-xl bg-slate-50/80 border border-slate-200/70 space-y-2">
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold text-rose-900 flex items-center gap-1.5">
+                    <span className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
                       <span className="w-2 h-2 rounded-full bg-rose-500" />
                       Dibatalkan (Cancelled)
                     </span>
-                    <span className="text-base font-black text-rose-800">
+                    <span className="text-base font-bold text-rose-700">
                       {ivStatus.cancelled || 0}
                     </span>
                   </div>
-                  <div className="w-full h-2 rounded-full bg-rose-200/50 overflow-hidden">
+                  <div className="w-full h-2 rounded-full bg-slate-200 overflow-hidden">
                     <div className="h-full bg-rose-600 rounded-full" style={{ width: `${ivCancelledPct}%` }} />
                   </div>
-                  <span className="text-[11px] text-rose-600 font-semibold block text-right">
+                  <span className="text-[11px] text-slate-500 font-medium block text-right">
                     {ivCancelledPct}% dari total
                   </span>
                 </div>
@@ -394,7 +392,7 @@ const Reports = () => {
               <div className="pt-2 text-center">
                 <Link
                   to="/company/interviews"
-                  className="text-xs font-bold text-purple-600 hover:text-purple-800 hover:underline"
+                  className="text-xs font-semibold text-blue-700 hover:underline"
                 >
                   Buka Manajemen Interview →
                 </Link>
@@ -405,20 +403,19 @@ const Reports = () => {
           {/* ========================================================
               4. JOB STATISTICS TABLE (Section 6)
               ======================================================== */}
-          <div className="bg-white rounded-3xl border border-slate-200/80 p-6 sm:p-7 shadow-xs space-y-4" data-testid="job-statistics-section">
+          <div className="bg-white rounded-xl border border-slate-200/90 p-6 sm:p-7 space-y-4" data-testid="job-statistics-section">
             <div className="flex items-center justify-between pb-3 border-b border-slate-100">
               <div>
-                <h2 className="text-base font-bold text-slate-900 flex items-center gap-2">
-                  <span className="w-2.5 h-5 rounded-full bg-emerald-600" />
+                <h2 className="text-base font-bold text-slate-900">
                   Statistik Berdasarkan Lowongan Kerja
                 </h2>
-                <p className="text-xs text-slate-400 mt-0.5">
+                <p className="text-xs text-slate-500 mt-0.5">
                   Rincian pelamar, wawancara, dan keputusan akhir per lowongan
                 </p>
               </div>
               <Link
                 to="/company/jobs"
-                className="text-xs font-bold text-blue-600 hover:underline"
+                className="text-xs font-semibold text-blue-700 hover:underline"
               >
                 Kelola Lowongan →
               </Link>
@@ -503,18 +500,17 @@ const Reports = () => {
               ======================================================== */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Top Candidate Matches */}
-            <div className="bg-white rounded-3xl border border-slate-200/80 p-6 sm:p-7 shadow-xs space-y-4" data-testid="top-candidates-section">
+            <div className="bg-white rounded-xl border border-slate-200/90 p-6 sm:p-7 space-y-4" data-testid="top-candidates-section">
               <div className="flex items-center justify-between pb-3 border-b border-slate-100">
                 <div>
-                  <h2 className="text-base font-bold text-slate-900 flex items-center gap-2">
-                    <span className="w-2.5 h-5 rounded-full bg-amber-500" />
+                  <h2 className="text-base font-bold text-slate-900">
                     Top Candidate Matches
                   </h2>
-                  <p className="text-xs text-slate-400 mt-0.5">
+                  <p className="text-xs text-slate-500 mt-0.5">
                     Kandidat dengan persentase kecocokan kualifikasi tertinggi
                   </p>
                 </div>
-                <span className="text-[11px] font-bold text-amber-700 bg-amber-50 px-2.5 py-1 rounded-xl">
+                <span className="text-[11px] font-semibold text-slate-700 bg-slate-100 px-2.5 py-1 rounded-lg">
                   Top 5
                 </span>
               </div>
@@ -529,10 +525,10 @@ const Reports = () => {
                     return (
                       <div
                         key={cand.application_id}
-                        className="p-3.5 rounded-2xl bg-slate-50/80 border border-slate-100 flex items-center justify-between gap-3 hover:border-blue-200 transition-all"
+                        className="p-3.5 rounded-xl bg-slate-50/80 border border-slate-200/70 flex items-center justify-between gap-3 hover:border-slate-300 transition-all"
                       >
                         <div className="flex items-center gap-3 min-w-0">
-                          <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-amber-500 to-orange-500 text-white font-black text-sm flex items-center justify-center shrink-0">
+                          <div className="w-10 h-10 rounded-lg bg-slate-900 text-white font-bold text-xs flex items-center justify-center shrink-0">
                             #{idx + 1}
                           </div>
                           <div className="min-w-0">
@@ -547,17 +543,17 @@ const Reports = () => {
 
                         <div className="flex items-center gap-3 shrink-0">
                           <div className="text-right">
-                            <span className="text-xs font-black text-emerald-600 block">
+                            <span className="text-xs font-bold text-emerald-700 block">
                               {matchPct}% Match
                             </span>
-                            <span className={`inline-block px-2 py-0.2 rounded-md text-[10px] font-bold border ${cfg.badge}`}>
+                            <span className={`inline-block px-2 py-0.2 rounded text-[10px] font-semibold border ${cfg.badge}`}>
                               {cfg.label}
                             </span>
                           </div>
 
                           <Link
                             to={`/company/applicants/${cand.application_id}`}
-                            className="p-2 rounded-xl bg-white border border-slate-200 hover:border-blue-400 text-slate-600 hover:text-blue-600 transition-colors"
+                            className="p-2 rounded-lg bg-white border border-slate-200 hover:border-slate-300 text-slate-600 hover:text-slate-900 transition-colors"
                             title="Buka Berkas Pelamar"
                           >
                             →
@@ -571,20 +567,19 @@ const Reports = () => {
             </div>
 
             {/* Recent Applications */}
-            <div className="bg-white rounded-3xl border border-slate-200/80 p-6 sm:p-7 shadow-xs space-y-4" data-testid="recent-applications-section">
+            <div className="bg-white rounded-xl border border-slate-200/90 p-6 sm:p-7 space-y-4" data-testid="recent-applications-section">
               <div className="flex items-center justify-between pb-3 border-b border-slate-100">
                 <div>
-                  <h2 className="text-base font-bold text-slate-900 flex items-center gap-2">
-                    <span className="w-2.5 h-5 rounded-full bg-blue-600" />
+                  <h2 className="text-base font-bold text-slate-900">
                     Lamaran Terbaru (Recent)
                   </h2>
-                  <p className="text-xs text-slate-400 mt-0.5">
+                  <p className="text-xs text-slate-500 mt-0.5">
                     Berkas pelamar yang baru saja masuk
                   </p>
                 </div>
                 <Link
                   to="/company/applicants"
-                  className="text-xs font-bold text-blue-600 hover:underline inline-flex items-center gap-1"
+                  className="text-xs font-semibold text-blue-700 hover:underline inline-flex items-center gap-1"
                   data-testid="view-all-applicants-btn"
                 >
                   Lihat Semua →
@@ -600,10 +595,10 @@ const Reports = () => {
                     return (
                       <div
                         key={app.id}
-                        className="p-3.5 rounded-2xl bg-slate-50/80 border border-slate-100 flex items-center justify-between gap-3 hover:border-blue-200 transition-all"
+                        className="p-3.5 rounded-xl bg-slate-50/80 border border-slate-200/70 flex items-center justify-between gap-3 hover:border-slate-300 transition-all"
                       >
                         <div className="flex items-center gap-3 min-w-0">
-                          <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-600 text-white font-bold text-sm flex items-center justify-center shrink-0">
+                          <div className="w-10 h-10 rounded-lg bg-slate-200 text-slate-700 font-bold text-sm flex items-center justify-center shrink-0">
                             {app.candidate_name ? app.candidate_name[0].toUpperCase() : 'K'}
                           </div>
                           <div className="min-w-0">
@@ -617,12 +612,12 @@ const Reports = () => {
                         </div>
 
                         <div className="flex items-center gap-2.5 shrink-0">
-                          <span className={`px-2.5 py-0.5 rounded-lg text-xs font-bold border ${cfg.badge}`}>
+                          <span className={`px-2.5 py-0.5 rounded-md text-xs font-semibold border ${cfg.badge}`}>
                             {cfg.label}
                           </span>
                           <Link
                             to={`/company/applicants/${app.id}`}
-                            className="p-2 rounded-xl bg-white border border-slate-200 hover:border-blue-400 text-slate-600 hover:text-blue-600 transition-colors"
+                            className="p-2 rounded-lg bg-white border border-slate-200 hover:border-slate-300 text-slate-600 hover:text-slate-900 transition-colors"
                             title="Buka Berkas Pelamar"
                           >
                             →

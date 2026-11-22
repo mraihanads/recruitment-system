@@ -19,6 +19,8 @@ class AdminReportController extends Controller
      */
     public function reports(Request $request): JsonResponse
     {
+        JobVacancy::autoCloseExpired();
+
         $totalUsers = User::count();
         $totalCandidates = User::where('role', 'candidate')->count();
         $totalCompanies = User::where('role', 'company')->count();

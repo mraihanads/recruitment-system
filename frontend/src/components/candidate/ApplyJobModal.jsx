@@ -28,7 +28,7 @@ const ApplyJobModal = ({
   if (!candidateProfile?.bio?.trim()) missingBiodata.push('Ringkasan Profil (Bio)');
 
   const isBiodataComplete = missingBiodata.length === 0;
-  const canApply = isBiodataComplete && hasCv && coverLetterFiles.length > 0;
+  const canApply = isBiodataComplete && hasCv;
 
   const handleAddFiles = (e) => {
     const selected = Array.from(e.target.files || []);
@@ -56,11 +56,6 @@ const ApplyJobModal = ({
 
     if (!hasCv) {
       setErrorMessage('Anda belum mengunggah CV. Silakan unggah CV terlebih dahulu di menu Profil sebelum melamar.');
-      return;
-    }
-
-    if (coverLetterFiles.length === 0) {
-      setErrorMessage('Silakan unggah minimal 1 berkas Surat Lamaran / Dokumen Persyaratan yang diminta perusahaan.');
       return;
     }
 
@@ -251,20 +246,20 @@ const ApplyJobModal = ({
           <div>
             <div className="flex items-center justify-between mb-1.5">
               <label htmlFor="cover-letter-file" className="block text-xs font-bold text-slate-700">
-                Unggah Surat Lamaran & Berkas Persyaratan <span className="text-rose-500">*</span>
+                Unggah Surat Lamaran & Berkas Persyaratan <span className="text-slate-400 font-normal">(Opsional)</span>
               </label>
               {coverLetterFiles.length > 0 ? (
                 <span className="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
                   ✓ {coverLetterFiles.length} Berkas Dipilih
                 </span>
               ) : (
-                <span className="text-[11px] text-amber-600 font-semibold">Wajib Diunggah</span>
+                <span className="text-[11px] text-slate-400 font-medium">Tidak Wajib</span>
               )}
             </div>
 
             {job.requirements && (
-              <div className="mb-2.5 p-3 rounded-xl bg-blue-50/60 border border-blue-100 text-[11px] text-slate-600">
-                <span className="font-bold text-blue-900 block mb-0.5">Persyaratan yang Diminta Perusahaan:</span>
+              <div className="mb-2.5 p-3 rounded-xl bg-slate-50 border border-slate-200/80 text-[11px] text-slate-600">
+                <span className="font-bold text-slate-800 block mb-0.5">Persyaratan yang Diminta Perusahaan:</span>
                 <p className="whitespace-pre-line line-clamp-3 leading-relaxed">{job.requirements}</p>
               </div>
             )}
@@ -273,7 +268,7 @@ const ApplyJobModal = ({
               <div className="flex items-center justify-between gap-2">
                 <label
                   htmlFor="cover-letter-file"
-                  className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold cursor-pointer transition-colors shadow-xs"
+                  className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-slate-900 hover:bg-blue-700 text-white text-xs font-semibold cursor-pointer transition-colors"
                 >
                   <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -322,7 +317,7 @@ const ApplyJobModal = ({
               )}
 
               <p className="text-[11px] text-slate-400">
-                Lampirkan Surat Lamaran beserta dokumen persyaratan yang diminta perusahaan seperti Ijazah, Transkrip, Sertifikat, dll. (Format: PDF, DOC, DOCX, JPG, PNG, ZIP — Maks 10MB/file).
+                Opsional: Lampirkan Surat Lamaran beserta dokumen pendukung tambahan seperti Ijazah, Transkrip, atau Sertifikat jika diperlukan (Format: PDF, DOC, DOCX, JPG, PNG, ZIP — Maks 10MB/file).
               </p>
             </div>
           </div>
@@ -333,17 +328,17 @@ const ApplyJobModal = ({
               type="button"
               onClick={onClose}
               disabled={submitting}
-              className="px-4 py-2 text-xs font-semibold text-slate-600 hover:text-slate-800 hover:bg-slate-100 rounded-xl transition-colors"
+              className="px-4 py-2 text-xs font-semibold text-slate-600 hover:text-slate-800 hover:bg-slate-100 rounded-lg transition-colors"
             >
               Batal
             </button>
             <button
               type="submit"
               disabled={submitting || !canApply}
-              className={`inline-flex items-center gap-2 px-5 py-2 text-xs font-bold text-white rounded-xl shadow-xs transition-all ${
+              className={`inline-flex items-center gap-2 px-5 py-2 text-xs font-semibold text-white rounded-lg transition-colors ${
                 submitting || !canApply
-                  ? 'bg-blue-300 cursor-not-allowed'
-                  : 'bg-blue-600 hover:bg-blue-700 active:scale-95'
+                  ? 'bg-slate-300 cursor-not-allowed'
+                  : 'bg-slate-900 hover:bg-blue-700'
               }`}
             >
               {submitting ? (

@@ -136,6 +136,11 @@ export const candidateService = {
     return res.data;
   },
 
+  async addSkills(skillIds) {
+    const res = await api.post('/candidate/skills', { skill_ids: skillIds });
+    return res.data;
+  },
+
   async removeSkill(skillId) {
     const res = await api.delete(`/candidate/skills/${skillId}`);
     return res.data;

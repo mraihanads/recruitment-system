@@ -26,18 +26,18 @@ const tabs = [
 
 const ProfileTabs = () => {
   return (
-    <div className="bg-white rounded-2xl border border-slate-200/80 p-2 shadow-xs mb-6 overflow-x-auto">
-      <nav className="flex items-center gap-1 min-w-max">
+    <div className="bg-white rounded-xl border border-slate-200/90 p-2 mb-6 overflow-x-auto">
+      <nav className="flex items-center gap-1.5 min-w-max">
         {tabs.map((tab) => (
           <NavLink
             key={tab.to}
             to={tab.to}
             end={tab.end}
             className={({ isActive }) =>
-              `flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold transition-all duration-150 ${
+              `flex items-center gap-2 px-4 py-2 rounded-lg text-xs sm:text-sm font-semibold transition-colors ${
                 isActive
-                  ? 'bg-blue-600 text-white shadow-xs'
-                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
+                  ? 'bg-slate-900 text-white'
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
               }`
             }
           >

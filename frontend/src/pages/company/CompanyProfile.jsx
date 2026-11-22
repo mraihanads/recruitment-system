@@ -322,10 +322,7 @@ const CompanyProfile = () => {
   return (
     <div className="space-y-6 pb-12">
       {/* Top Banner & Header Card */}
-      <div className="bg-white rounded-3xl border border-slate-200/80 p-6 sm:p-8 shadow-xs relative overflow-hidden">
-        {/* Decorative background accent */}
-        <div className="absolute top-0 right-0 w-80 h-40 bg-gradient-to-bl from-blue-500/10 via-indigo-500/5 to-transparent rounded-bl-full pointer-events-none" />
-
+      <div className="bg-white rounded-xl border border-slate-200/90 p-6 sm:p-7 relative overflow-hidden">
         <div className="flex flex-col md:flex-row items-start justify-between gap-6 relative">
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-5 min-w-0">
             {/* Company Logo Section */}
@@ -334,10 +331,10 @@ const CompanyProfile = () => {
                 <img
                   src={currentLogoSrc}
                   alt={profile.company_name}
-                  className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl object-cover border-2 border-slate-100 shadow-xs"
+                  className="w-20 h-20 sm:w-24 sm:h-24 rounded-xl object-cover border border-slate-200"
                 />
               ) : (
-                <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-600 text-white font-black text-3xl flex items-center justify-center shadow-xs">
+                <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-xl bg-slate-900 text-white font-bold text-3xl flex items-center justify-center">
                   {profile.company_name ? profile.company_name[0].toUpperCase() : 'P'}
                 </div>
               )}
@@ -347,7 +344,7 @@ const CompanyProfile = () => {
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
                 disabled={logoUploading}
-                className="absolute inset-0 bg-slate-900/60 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center text-white text-[11px] font-bold p-1 text-center"
+                className="absolute inset-0 bg-slate-900/60 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center text-white text-[11px] font-bold p-1 text-center"
                 title="Unggah Logo Baru"
               >
                 {logoUploading ? (
@@ -374,11 +371,11 @@ const CompanyProfile = () => {
             {/* Company Info Header */}
             <div className="min-w-0">
               <div className="flex flex-wrap items-center gap-2 mb-1.5">
-                <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                <span className="text-xs font-mono uppercase tracking-wider text-blue-700 font-semibold">
                   Profil Perusahaan
                 </span>
                 <span
-                  className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg text-xs font-bold border ${statusConfig.color}`}
+                  className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md text-xs font-semibold border ${statusConfig.color}`}
                   data-testid="company-verification-badge"
                 >
                   <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${statusConfig.dot}`} />
@@ -386,7 +383,7 @@ const CompanyProfile = () => {
                 </span>
               </div>
 
-              <h1 className="text-xl sm:text-2xl font-black text-slate-900 leading-tight">
+              <h1 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight leading-tight">
                 {profile.company_name || 'Nama Perusahaan'}
               </h1>
 
@@ -412,9 +409,9 @@ const CompanyProfile = () => {
                     href={profile.website}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center gap-1.5 text-blue-600 hover:text-blue-700 font-semibold"
+                    className="flex items-center gap-1.5 text-blue-700 hover:underline font-semibold"
                   >
-                    <svg className="w-4 h-4 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <svg className="w-4 h-4 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
                     </svg>
                     Kunjungi Website
@@ -429,7 +426,7 @@ const CompanyProfile = () => {
             <button
               type="button"
               onClick={() => setIsEditing(true)}
-              className="px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold transition-all shadow-xs inline-flex items-center gap-2 shrink-0"
+              className="px-4 py-2.5 rounded-lg bg-slate-900 hover:bg-blue-700 text-white text-xs font-semibold transition-colors inline-flex items-center gap-2 shrink-0"
               data-testid="edit-profile-btn"
             >
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -444,7 +441,7 @@ const CompanyProfile = () => {
       {/* Global Feedback Banner */}
       {feedback.message && (
         <div
-          className={`p-4 rounded-2xl border text-xs font-medium flex items-center justify-between gap-3 ${feedback.type === 'success'
+          className={`p-4 rounded-xl border text-xs font-medium flex items-center justify-between gap-3 ${feedback.type === 'success'
             ? 'bg-emerald-50 text-emerald-800 border-emerald-200'
             : 'bg-rose-50 text-rose-800 border-rose-200'
             }`}
@@ -465,10 +462,9 @@ const CompanyProfile = () => {
         {/* Kolom Kiri / Utama: Detail Profil Form & Dokumen */}
         <div className="lg:col-span-2 space-y-6">
           {/* Card: Informasi Profil */}
-          <div className="bg-white rounded-3xl border border-slate-200/80 p-6 sm:p-7 shadow-xs">
-            <div className="flex items-center justify-between mb-5">
-              <h2 className="text-base font-bold text-slate-900 flex items-center gap-2.5">
-                <span className="w-2 h-5 rounded-full bg-blue-600" />
+          <div className="bg-white rounded-xl border border-slate-200/90 p-6 sm:p-7">
+            <div className="flex items-center justify-between mb-5 pb-3 border-b border-slate-100">
+              <h2 className="text-base font-bold text-slate-900">
                 Informasi & Biodata Perusahaan
               </h2>
             </div>
@@ -568,7 +564,7 @@ const CompanyProfile = () => {
                   <button
                     type="submit"
                     disabled={saving}
-                    className="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold transition-all shadow-xs disabled:opacity-50"
+                    className="px-5 py-2.5 rounded-lg bg-slate-900 hover:bg-blue-700 text-white text-xs font-semibold transition-colors disabled:opacity-50"
                   >
                     {saving ? 'Menyimpan...' : 'Simpan Perubahan'}
                   </button>
@@ -576,7 +572,7 @@ const CompanyProfile = () => {
                     type="button"
                     onClick={handleCancelEdit}
                     disabled={saving}
-                    className="px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition-all"
+                    className="px-4 py-2.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold transition-colors"
                   >
                     Batal
                   </button>
@@ -601,7 +597,7 @@ const CompanyProfile = () => {
                         href={profile.website}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-blue-600 hover:underline font-semibold break-all"
+                        className="text-blue-700 hover:underline font-semibold break-all"
                       >
                         {profile.website}
                       </a>
@@ -633,11 +629,10 @@ const CompanyProfile = () => {
           </div>
 
           {/* Card: Dokumen Verifikasi Perusahaan (Requirement 5) */}
-          <div id="dokumen-legalitas" className="bg-white rounded-3xl border border-slate-200/80 p-6 sm:p-7 shadow-xs scroll-mt-6">
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-5">
+          <div id="dokumen-legalitas" className="bg-white rounded-xl border border-slate-200/90 p-6 sm:p-7 scroll-mt-6">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-5 pb-3 border-b border-slate-100">
               <div>
-                <h2 className="text-base font-bold text-slate-900 flex items-center gap-2.5">
-                  <span className="w-2 h-5 rounded-full bg-emerald-600" />
+                <h2 className="text-base font-bold text-slate-900">
                   Dokumen Legalitas & Verifikasi
                 </h2>
                 <p className="text-xs text-slate-500 mt-1">
@@ -648,7 +643,7 @@ const CompanyProfile = () => {
               <button
                 type="button"
                 onClick={() => setShowDocModal(true)}
-                className="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition-all shadow-xs inline-flex items-center gap-1.5 shrink-0"
+                className="px-4 py-2.5 rounded-lg bg-slate-900 hover:bg-blue-700 text-white text-xs font-semibold transition-colors inline-flex items-center gap-1.5 shrink-0"
                 data-testid="upload-document-btn"
               >
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -660,7 +655,7 @@ const CompanyProfile = () => {
 
             {/* List Documents */}
             {documents.length === 0 ? (
-              <div className="p-8 rounded-2xl bg-slate-50 border border-slate-100 text-center">
+              <div className="p-8 rounded-xl bg-slate-50 border border-slate-100 text-center">
                 <svg className="w-10 h-10 text-slate-300 mx-auto mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                 </svg>
@@ -679,10 +674,10 @@ const CompanyProfile = () => {
                   return (
                     <div
                       key={doc.id}
-                      className="p-4 rounded-2xl border border-slate-200/80 bg-white hover:bg-slate-50/50 transition-colors flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3"
+                      className="p-4 rounded-xl border border-slate-200/90 bg-white hover:bg-slate-50/50 transition-colors flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3"
                     >
                       <div className="flex items-center gap-3 min-w-0">
-                        <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
+                        <div className="w-10 h-10 rounded-lg bg-slate-100 text-slate-600 flex items-center justify-center shrink-0">
                           <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
                           </svg>
@@ -698,7 +693,7 @@ const CompanyProfile = () => {
                       </div>
 
                       <div className="flex items-center gap-2 self-end sm:self-center">
-                        <span className={`px-2.5 py-0.5 rounded-lg text-[11px] font-bold border ${badge.color}`}>
+                        <span className={`px-2.5 py-0.5 rounded-md text-[11px] font-semibold border ${badge.color}`}>
                           {badge.label}
                         </span>
 
@@ -707,7 +702,7 @@ const CompanyProfile = () => {
                             href={docUrl}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="px-2.5 py-1 rounded-lg text-xs font-bold text-blue-600 bg-blue-50 hover:bg-blue-600 hover:text-white transition-colors"
+                            className="px-2.5 py-1 rounded-lg text-xs font-semibold text-slate-700 bg-slate-100 hover:bg-slate-900 hover:text-white transition-colors"
                           >
                             Buka File
                           </a>
@@ -738,15 +733,15 @@ const CompanyProfile = () => {
         {/* Kolom Kanan / Sidebar: Panduan & Status Verifikasi */}
         <div className="space-y-6">
           {/* Card: Status Akun */}
-          <div className="bg-white rounded-3xl border border-slate-200/80 p-6 shadow-xs">
-            <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3">
+          <div className="bg-white rounded-xl border border-slate-200/90 p-6">
+            <h3 className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-3">
               Status Verifikasi Akun
             </h3>
 
-            <div className={`p-4 rounded-2xl border ${statusConfig.color} space-y-2`}>
+            <div className={`p-4 rounded-xl border ${statusConfig.color} space-y-2`}>
               <div className="flex items-center gap-2">
                 <span className={`w-2.5 h-2.5 rounded-full ${statusConfig.dot}`} />
-                <span className="text-sm font-extrabold">{statusConfig.label}</span>
+                <span className="text-sm font-bold">{statusConfig.label}</span>
               </div>
               <p className="text-xs leading-relaxed opacity-90">
                 {statusConfig.description}
@@ -764,8 +759,8 @@ const CompanyProfile = () => {
           </div>
 
           {/* Card: Panduan Dokumen */}
-          <div className="bg-white rounded-3xl border border-slate-200/80 p-6 shadow-xs">
-            <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3">
+          <div className="bg-white rounded-xl border border-slate-200/90 p-6">
+            <h3 className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-3">
               Ketentuan Dokumen
             </h3>
             <ul className="text-xs text-slate-600 space-y-2.5 leading-relaxed">

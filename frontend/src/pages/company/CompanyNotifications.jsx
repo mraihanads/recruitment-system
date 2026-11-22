@@ -61,11 +61,16 @@ const CompanyNotifications = () => {
   const unreadCount = notifications.filter((n) => !n.is_read).length;
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+    <div className="space-y-6 pb-12">
+      <div className="bg-white rounded-xl border border-slate-200/90 p-6 sm:p-7 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Notifikasi Perusahaan</h1>
-          <p className="text-sm text-slate-500 mt-1">
+          <span className="text-xs font-mono uppercase tracking-wider text-blue-700 font-semibold block mb-1.5">
+            Pusat Informasi
+          </span>
+          <h1 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight mb-1">
+            Notifikasi Perusahaan
+          </h1>
+          <p className="text-xs sm:text-sm text-slate-500">
             Pemberitahuan lamaran masuk, status verifikasi perusahaan, dan aktivitas rekrutmen.
           </p>
         </div>
@@ -73,7 +78,7 @@ const CompanyNotifications = () => {
           <button
             disabled={actionLoading}
             onClick={handleMarkAllAsRead}
-            className="px-3.5 py-2 text-xs font-semibold text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-xl border border-blue-200 transition disabled:opacity-50"
+            className="px-4 py-2.5 text-xs font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-lg border border-slate-200/80 transition-colors disabled:opacity-50 shrink-0"
           >
             {actionLoading ? 'Menandai...' : 'Tandai Semua Dibaca'}
           </button>
@@ -83,27 +88,27 @@ const CompanyNotifications = () => {
       <div className="flex items-center gap-2 border-b border-slate-200 pb-3">
         <button
           onClick={() => setFilter('all')}
-          className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition ${
+          className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-colors ${
             filter === 'all'
-              ? 'bg-blue-600 text-white'
-              : 'text-slate-600 hover:bg-slate-100'
+              ? 'bg-slate-900 text-white'
+              : 'text-slate-600 bg-white border border-slate-200/80 hover:bg-slate-100'
           }`}
         >
           Semua ({notifications.length})
         </button>
         <button
           onClick={() => setFilter('unread')}
-          className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition ${
+          className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-colors ${
             filter === 'unread'
-              ? 'bg-blue-600 text-white'
-              : 'text-slate-600 hover:bg-slate-100'
+              ? 'bg-slate-900 text-white'
+              : 'text-slate-600 bg-white border border-slate-200/80 hover:bg-slate-100'
           }`}
         >
           Belum Dibaca ({unreadCount})
         </button>
       </div>
 
-      <div className="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
+      <div className="bg-white rounded-xl border border-slate-200/90 overflow-hidden">
         {loading ? (
           <div className="py-12">
             <LoadingScreen message="Memuat notifikasi..." />

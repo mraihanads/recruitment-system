@@ -31,6 +31,8 @@ class JobController extends Controller
      */
     public function index(Request $request): JsonResponse
     {
+        JobVacancy::autoCloseExpired();
+
         $query = JobVacancy::with([
             'company:id,user_id,company_name,logo,address,verification_status',
             'category:id,name',
@@ -85,6 +87,8 @@ class JobController extends Controller
      */
     public function show(Request $request, $id): JsonResponse
     {
+        JobVacancy::autoCloseExpired();
+
         $job = JobVacancy::with([
             'company:id,user_id,company_name,description,logo,address,phone,website,verification_status',
             'category:id,name,description',
@@ -237,13 +241,6 @@ class JobController extends Controller
             $uploadedFiles = [$request->file('cover_letter_file')];
         }
 
-        if (empty($uploadedFiles)) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Silakan unggah minimal 1 berkas Surat Lamaran / Dokumen Persyaratan yang diminta perusahaan.',
-            ], 422);
-        }
-
         $allowedExtensions = ['pdf', 'doc', 'docx', 'jpg', 'jpeg', 'png', 'zip'];
         $storedPaths = [];
 
@@ -280,7 +277,9 @@ class JobController extends Controller
             );
         }
 
-        $coverLetterValue = count($storedPaths) === 1 ? $storedPaths[0] : json_encode($storedPaths);
+        $coverLetterValue = empty($storedPaths)
+            ? ($request->input('cover_letter') ?: null)
+            : (count($storedPaths) === 1 ? $storedPaths[0] : json_encode($storedPaths));
 
         $matchResult = $this->matchingService->calculate($candidate, $job);
 
@@ -354,6 +353,8 @@ class JobController extends Controller
      */
     public function publicStats(): JsonResponse
     {
+        JobVacancy::autoCloseExpired();
+
         if (JobCategory::count() === 0) {
             $this->categories();
         }
