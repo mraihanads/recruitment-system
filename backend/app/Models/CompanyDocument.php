@@ -34,8 +34,14 @@ class CompanyDocument extends Model
         if (str_starts_with($this->document_file, 'http://') || str_starts_with($this->document_file, 'https://')) {
             return $this->document_file;
         }
-        $clean = ltrim(preg_replace('/^public\//', '', $this->document_file), '/');
-        return url("storage/{$clean}");
+        if ($this->id) {
+            return \Illuminate\Support\Facades\URL::temporarySignedRoute(
+                'private.files.company-document',
+                now()->addMinutes(30),
+                ['id' => $this->id]
+            );
+        }
+        return null;
     }
 
     public function company(): BelongsTo

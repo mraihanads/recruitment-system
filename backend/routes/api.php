@@ -27,6 +27,7 @@ use App\Http\Controllers\AdminNotificationController;
 use App\Http\Controllers\AdminReportController;
 use App\Http\Controllers\AdminUserController;
 use App\Http\Controllers\JobController;
+use App\Http\Controllers\PrivateFileController;
 use App\Http\Controllers\SavedJobController;
 use Illuminate\Support\Facades\Route;
 
@@ -44,10 +45,30 @@ Route::get('/public/jobs/{id}', [JobController::class, 'show']);
 Route::get('/public/job-categories', [JobController::class, 'categories']);
 Route::get('/public/stats', [JobController::class, 'publicStats']);
 
+// Cryptographically Signed Temporary Private Document Routes (30-min expiry, HMAC verified)
+Route::middleware('signed')->prefix('files/signed')->group(function () {
+    Route::get('/company-documents/{id}', [PrivateFileController::class, 'signedCompanyDocument'])
+        ->name('private.files.company-document');
+    Route::get('/candidate-cv/{profileId}', [PrivateFileController::class, 'signedCandidateCv'])
+        ->name('private.files.candidate-cv');
+    Route::get('/applications/{applicationId}/cv', [PrivateFileController::class, 'signedApplicationCv'])
+        ->name('private.files.application-cv');
+    Route::get('/applications/{applicationId}/attachment/{index}', [PrivateFileController::class, 'signedApplicationAttachment'])
+        ->name('private.files.application-attachment');
+});
+
 // Authenticated Routes
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/me', [AuthController::class, 'me']);
+
+    // Authenticated Private File Downloads (Strict Role & Ownership Authorization)
+    Route::prefix('files')->group(function () {
+        Route::get('/company-documents/{id}', [PrivateFileController::class, 'downloadCompanyDocument']);
+        Route::get('/candidate-cv/{profileId}', [PrivateFileController::class, 'downloadCandidateCv']);
+        Route::get('/applications/{applicationId}/cv', [PrivateFileController::class, 'downloadApplicationCv']);
+        Route::get('/applications/{applicationId}/attachment/{index}', [PrivateFileController::class, 'downloadApplicationAttachment']);
+    });
 
     // Master Categories & Skills (Shared for candidate, company & admin)
     Route::get('/job-categories', [JobController::class, 'categories']);

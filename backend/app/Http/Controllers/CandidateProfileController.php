@@ -101,8 +101,12 @@ class CandidateProfileController extends Controller
             'full_name' => $user->name,
         ]);
 
-        if ($profile->cv_file && Storage::disk('public')->exists($profile->cv_file)) {
-            Storage::disk('public')->delete($profile->cv_file);
+        if ($profile->cv_file) {
+            if (Storage::disk('private')->exists($profile->cv_file)) {
+                Storage::disk('private')->delete($profile->cv_file);
+            } elseif (Storage::disk('public')->exists($profile->cv_file)) {
+                Storage::disk('public')->delete($profile->cv_file);
+            }
         }
 
         $uploadedFile = $request->file('cv_file');
@@ -113,7 +117,7 @@ class CandidateProfileController extends Controller
             $safeOriginalName = 'CV_' . $profile->id . '.' . $extension;
         }
 
-        $path = $uploadedFile->storeAs("candidate/cvs/{$profile->id}", $safeOriginalName, 'public');
+        $path = $uploadedFile->storeAs("candidate/cvs/{$profile->id}", $safeOriginalName, 'private');
         $profile->update(['cv_file' => $path]);
         $freshProfile = $profile->fresh();
 

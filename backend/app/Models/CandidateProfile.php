@@ -42,8 +42,14 @@ class CandidateProfile extends Model
         if (str_starts_with($this->cv_file, 'http://') || str_starts_with($this->cv_file, 'https://')) {
             return $this->cv_file;
         }
-        $clean = ltrim(preg_replace('/^public\//', '', $this->cv_file), '/');
-        return url("storage/{$clean}");
+        if ($this->id) {
+            return \Illuminate\Support\Facades\URL::temporarySignedRoute(
+                'private.files.candidate-cv',
+                now()->addMinutes(30),
+                ['profileId' => $this->id]
+            );
+        }
+        return null;
     }
 
     public function user(): BelongsTo

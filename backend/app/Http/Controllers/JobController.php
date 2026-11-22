@@ -273,7 +273,7 @@ class JobController extends Controller
             $storedPaths[] = $uploadedFile->storeAs(
                 "candidate/cover_letters/{$candidate->id}/{$job->id}",
                 $safeOriginalName,
-                'public'
+                'private'
             );
         }
 

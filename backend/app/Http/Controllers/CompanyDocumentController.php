@@ -57,7 +57,7 @@ class CompanyDocumentController extends Controller
 
         $company = $this->getCompany($request);
 
-        $path = $request->file('document_file')->store('company/documents', 'public');
+        $path = $request->file('document_file')->store('company/documents', 'private');
 
         $doc = $company->companyDocuments()->create([
             'document_type' => $request->document_type,
@@ -74,7 +74,7 @@ class CompanyDocumentController extends Controller
                 'id' => $doc->id,
                 'document_type' => $doc->document_type,
                 'document_file' => $doc->document_file,
-                'document_url' => Storage::disk('public')->url($doc->document_file),
+                'document_url' => $doc->document_url,
                 'verification_status' => $doc->verification_status,
                 'created_at' => $doc->created_at,
             ],
@@ -110,7 +110,7 @@ class CompanyDocumentController extends Controller
                 'id' => $document->id,
                 'document_type' => $document->document_type,
                 'document_file' => $document->document_file,
-                'document_url' => Storage::disk('public')->url($document->document_file),
+                'document_url' => $document->document_url,
                 'verification_status' => $document->verification_status,
                 'created_at' => $document->created_at,
             ],
@@ -146,8 +146,12 @@ class CompanyDocumentController extends Controller
             ], 403);
         }
 
-        if ($document->document_file && Storage::disk('public')->exists($document->document_file)) {
-            Storage::disk('public')->delete($document->document_file);
+        if ($document->document_file) {
+            if (Storage::disk('private')->exists($document->document_file)) {
+                Storage::disk('private')->delete($document->document_file);
+            } elseif (Storage::disk('public')->exists($document->document_file)) {
+                Storage::disk('public')->delete($document->document_file);
+            }
         }
 
         $document->delete();

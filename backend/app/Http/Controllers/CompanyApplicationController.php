@@ -73,7 +73,7 @@ class CompanyApplicationController extends Controller
                     'photo_url' => $candidate->photo ? Storage::disk('public')->url($candidate->photo) : null,
                     'bio' => $candidate->bio,
                     'cv_file' => $app->cv_file,
-                    'cv_url' => $app->cv_file ? Storage::disk('public')->url($app->cv_file) : null,
+                    'cv_url' => $app->cv_url,
                 ] : null,
             ];
         });
@@ -115,11 +115,9 @@ class CompanyApplicationController extends Controller
 
         $cand = $application->candidateProfile;
         $effectiveCvFile = $application->cv_file ?: ($cand ? $cand->cv_file : null);
-        $effectiveCvUrl = $effectiveCvFile
-            ? (str_starts_with($effectiveCvFile, 'http')
-                ? $effectiveCvFile
-                : url('storage/' . ltrim(preg_replace('/^public\//', '', $effectiveCvFile), '/')))
-            : null;
+        $effectiveCvUrl = $application->cv_file
+            ? $application->cv_url
+            : ($cand ? $cand->cv_url : null);
 
         return response()->json([
             'success' => true,

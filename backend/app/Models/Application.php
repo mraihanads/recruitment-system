@@ -37,8 +37,14 @@ class Application extends Model
         if (str_starts_with($this->cv_file, 'http://') || str_starts_with($this->cv_file, 'https://')) {
             return $this->cv_file;
         }
-        $clean = ltrim(preg_replace('/^public\//', '', $this->cv_file), '/');
-        return url("storage/{$clean}");
+        if ($this->id) {
+            return \Illuminate\Support\Facades\URL::temporarySignedRoute(
+                'private.files.application-cv',
+                now()->addMinutes(30),
+                ['applicationId' => $this->id]
+            );
+        }
+        return null;
     }
 
     public function getCoverLetterFilesAttribute(): array
@@ -58,11 +64,17 @@ class Application extends Model
         }
 
         $result = [];
-        foreach ($paths as $p) {
+        foreach (array_values($paths) as $idx => $p) {
             if (!is_string($p) || empty($p)) continue;
             $url = (str_starts_with($p, 'http://') || str_starts_with($p, 'https://'))
                 ? $p
-                : url('storage/' . ltrim(preg_replace('/^public\//', '', $p), '/'));
+                : ($this->id
+                    ? \Illuminate\Support\Facades\URL::temporarySignedRoute(
+                        'private.files.application-attachment',
+                        now()->addMinutes(30),
+                        ['applicationId' => $this->id, 'index' => $idx]
+                    )
+                    : null);
             $result[] = [
                 'path' => $p,
                 'name' => basename($p),
