@@ -47,7 +47,7 @@ const Interviews = () => {
   const [interviews, setInterviews] = useState([]);
   const [applicants, setApplicants] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [, setError] = useState(null);
   const [actionLoading, setActionLoading] = useState(false);
   const [feedback, setFeedback] = useState({ type: '', message: '' });
 
@@ -73,17 +73,6 @@ const Interviews = () => {
   });
   const [formErrors, setFormErrors] = useState({});
 
-  useEffect(() => {
-    loadData();
-    // If URL has ?schedule_app_id=..., automatically open create modal for that application
-    const targetAppId = searchParams.get('schedule_app_id');
-    if (targetAppId) {
-      setFormData((prev) => ({ ...prev, application_id: targetAppId }));
-      setShowModal(true);
-      setModalMode('create');
-    }
-  }, [searchParams]);
-
   const loadData = async () => {
     try {
       setLoading(true);
@@ -101,6 +90,17 @@ const Interviews = () => {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    loadData();
+    // If URL has ?schedule_app_id=..., automatically open create modal for that application
+    const targetAppId = searchParams.get('schedule_app_id');
+    if (targetAppId) {
+      setFormData((prev) => ({ ...prev, application_id: targetAppId }));
+      setShowModal(true);
+      setModalMode('create');
+    }
+  }, [searchParams]);
 
   // Stats calculation
   const stats = useMemo(() => {

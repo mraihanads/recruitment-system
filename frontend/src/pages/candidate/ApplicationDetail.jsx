@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, Link, useNavigate } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import candidateService from '../../services/candidateService';
 import ApplicationStatusBadge, { statusConfig } from '../../components/candidate/ApplicationStatusBadge';
 import ApplicationTimeline from '../../components/candidate/ApplicationTimeline';
@@ -38,7 +38,6 @@ const formatDate = (dateString) => {
 
 const ApplicationDetail = () => {
   const { id } = useParams();
-  const navigate = useNavigate();
 
   const [application, setApplication] = useState(null);
   const [matchData, setMatchData] = useState(null);
@@ -62,7 +61,7 @@ const ApplicationDetail = () => {
             if (matchRes?.success) {
               setMatchData(matchRes.data);
             }
-          } catch (e) {
+          } catch {
             // Non-blocking match breakdown
           }
         }

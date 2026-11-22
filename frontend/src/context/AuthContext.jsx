@@ -27,7 +27,7 @@ export const AuthProvider = ({ children }) => {
       } else {
         throw new Error('Data user tidak valid.');
       }
-    } catch (error) {
+    } catch {
       localStorage.removeItem('auth_token');
       setToken(null);
       setUser(null);
@@ -60,7 +60,7 @@ export const AuthProvider = ({ children }) => {
   const logout = async () => {
     try {
       await authService.logout();
-    } catch (err) {
+    } catch {
       // Ignored: Local cleanup must still execute even if network fails
     } finally {
       localStorage.removeItem('auth_token');

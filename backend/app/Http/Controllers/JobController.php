@@ -72,7 +72,7 @@ class JobController extends Controller
             $query->where('category_id', $request->category_id);
         }
 
-        $perPage = (int) $request->get('per_page', 10);
+        $perPage = max(1, min((int) $request->get('per_page', 10), 100));
         $jobs = $query->latest()->paginate($perPage);
 
         return response()->json([

@@ -25,6 +25,13 @@ class RoleMiddleware
             ], 401);
         }
 
+        if ($user->status === 'inactive') {
+            return response()->json([
+                'success' => false,
+                'message' => 'Akun Anda dinonaktifkan. Silakan hubungi administrator.',
+            ], 403);
+        }
+
         if (!in_array($user->role, $roles, true)) {
             return response()->json([
                 'success' => false,

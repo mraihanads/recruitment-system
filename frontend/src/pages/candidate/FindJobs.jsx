@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import candidateService from '../../services/candidateService';
 import JobCard from '../../components/candidate/JobCard';
 import LoadingScreen from '../../components/common/LoadingScreen';
@@ -68,7 +68,7 @@ const FindJobs = () => {
           const ids = new Set((savedRes.value.data || []).map((item) => item.job_id || item.jobVacancy?.id));
           setSavedJobIds(ids);
         }
-      } catch (e) {
+      } catch {
         // Non-blocking metadata error
       }
     };

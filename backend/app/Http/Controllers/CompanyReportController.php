@@ -9,6 +9,7 @@ use App\Models\JobVacancy;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 
 class CompanyReportController extends Controller
@@ -68,12 +69,16 @@ class CompanyReportController extends Controller
 
         $period = $request->query('period', 'all');
 
-        // 1. Jobs query for company
-        $jobsQuery = $company->jobVacancies();
-        $totalJobs = (clone $jobsQuery)->count();
-        $activeJobs = (clone $jobsQuery)->where('status', 'active')->count();
-        $closedJobs = (clone $jobsQuery)->where('status', 'closed')->count();
-        $companyJobIds = (clone $jobsQuery)->pluck('id')->toArray();
+        // 1. Jobs summary using single grouped query instead of multiple COUNTs
+        $jobStatusCounts = $company->jobVacancies()
+            ->select('status', DB::raw('COUNT(*) as total'))
+            ->groupBy('status')
+            ->pluck('total', 'status');
+
+        $totalJobs = (int) $jobStatusCounts->sum();
+        $activeJobs = (int) ($jobStatusCounts['active'] ?? 0);
+        $closedJobs = (int) ($jobStatusCounts['closed'] ?? 0);
+        $companyJobIds = $company->jobVacancies()->pluck('id')->toArray();
 
         // 2. Base Applications Query for company's vacancies
         $appBaseQuery = Application::whereIn('job_id', $companyJobIds);
@@ -87,23 +92,29 @@ class CompanyReportController extends Controller
             $appBaseQuery->where('applied_at', '>=', Carbon::now()->startOfYear());
         }
 
-        $totalApplications = (clone $appBaseQuery)->count();
-        $acceptedApplications = (clone $appBaseQuery)->where('status', 'accepted')->count();
-        $rejectedApplications = (clone $appBaseQuery)->where('status', 'rejected')->count();
+        // Single grouped query for all application status counts
+        $appStatusCounts = (clone $appBaseQuery)
+            ->select('status', DB::raw('COUNT(*) as total'))
+            ->groupBy('status')
+            ->pluck('total', 'status');
 
-        // Application status breakdown
+        $totalApplications = (int) $appStatusCounts->sum();
+        $acceptedApplications = (int) ($appStatusCounts['accepted'] ?? 0);
+        $rejectedApplications = (int) ($appStatusCounts['rejected'] ?? 0);
+
         $applicationStatus = [
-            'submitted' => (clone $appBaseQuery)->where('status', 'submitted')->count(),
-            'screening' => (clone $appBaseQuery)->where('status', 'screening')->count(),
-            'interview' => (clone $appBaseQuery)->where('status', 'interview')->count(),
-            'test' => (clone $appBaseQuery)->where('status', 'test')->count(),
+            'submitted' => (int) ($appStatusCounts['submitted'] ?? 0),
+            'screening' => (int) ($appStatusCounts['screening'] ?? 0),
+            'interview' => (int) ($appStatusCounts['interview'] ?? 0),
+            'test' => (int) ($appStatusCounts['test'] ?? 0),
             'accepted' => $acceptedApplications,
             'rejected' => $rejectedApplications,
         ];
 
-        // 3. Interview query
-        $allAppIdsForCompany = Application::whereIn('job_id', $companyJobIds)->pluck('id')->toArray();
-        $interviewBaseQuery = Interview::whereIn('application_id', $allAppIdsForCompany);
+        // 3. Single grouped query for interview status counts (joined via applications.job_id)
+        $interviewBaseQuery = Interview::whereHas('application', function ($q) use ($companyJobIds) {
+            $q->whereIn('job_id', $companyJobIds);
+        });
 
         if ($period === 'month') {
             $interviewBaseQuery->where('interview_date', '>=', Carbon::now()->startOfMonth());
@@ -113,10 +124,15 @@ class CompanyReportController extends Controller
             $interviewBaseQuery->where('interview_date', '>=', Carbon::now()->startOfYear());
         }
 
-        $totalInterviews = (clone $interviewBaseQuery)->count();
-        $interviewScheduled = (clone $interviewBaseQuery)->where('status', 'scheduled')->count();
-        $interviewCompleted = (clone $interviewBaseQuery)->where('status', 'completed')->count();
-        $interviewCancelled = (clone $interviewBaseQuery)->where('status', 'cancelled')->count();
+        $ivStatusCounts = (clone $interviewBaseQuery)
+            ->select('status', DB::raw('COUNT(*) as total'))
+            ->groupBy('status')
+            ->pluck('total', 'status');
+
+        $totalInterviews = (int) $ivStatusCounts->sum();
+        $interviewScheduled = (int) ($ivStatusCounts['scheduled'] ?? 0);
+        $interviewCompleted = (int) ($ivStatusCounts['completed'] ?? 0);
+        $interviewCancelled = (int) ($ivStatusCounts['cancelled'] ?? 0);
 
         $interviewStatus = [
             'scheduled' => $interviewScheduled,
@@ -125,7 +141,15 @@ class CompanyReportController extends Controller
             'total' => $totalInterviews,
         ];
 
-        // 4. Job Statistics Breakdown (with applicants, interviews, accepted, rejected)
+        // 4. Job Statistics Breakdown — eliminate 2N+1 interview count queries with a single grouped join
+        $interviewCountsByJob = empty($companyJobIds)
+            ? collect()
+            : Interview::join('applications', 'interviews.application_id', '=', 'applications.id')
+                ->whereIn('applications.job_id', $companyJobIds)
+                ->select('applications.job_id', DB::raw('COUNT(interviews.id) as total'))
+                ->groupBy('applications.job_id')
+                ->pluck('total', 'job_id');
+
         $jobsList = $company->jobVacancies()
             ->withCount([
                 'applications',
@@ -137,10 +161,7 @@ class CompanyReportController extends Controller
                 },
             ])
             ->get()
-            ->map(function ($job) {
-                $jobAppIds = $job->applications()->pluck('id')->toArray();
-                $ivCount = Interview::whereIn('application_id', $jobAppIds)->count();
-
+            ->map(function ($job) use ($interviewCountsByJob) {
                 return [
                     'id' => $job->id,
                     'title' => $job->title,
@@ -148,7 +169,7 @@ class CompanyReportController extends Controller
                     'employment_type' => $job->employment_type,
                     'location' => $job->location,
                     'applications_count' => (int) $job->applications_count,
-                    'interviews_count' => $ivCount,
+                    'interviews_count' => (int) ($interviewCountsByJob[$job->id] ?? 0),
                     'accepted_count' => (int) $job->accepted_count,
                     'rejected_count' => (int) $job->rejected_count,
                     'created_at' => $job->created_at,

@@ -44,8 +44,11 @@ class CompanyDocumentController extends Controller
         ]);
 
         $allowedExtensions = ['pdf', 'jpg', 'jpeg', 'png'];
-        $extension = strtolower($request->file('document_file')->getClientOriginalExtension());
-        if (!in_array($extension, $allowedExtensions)) {
+        $file = $request->file('document_file');
+        $extension = strtolower($file->getClientOriginalExtension());
+        $detectedMime = strtolower((string) $file->getMimeType());
+        $blockedMimes = ['text/html', 'text/x-php', 'application/x-httpd-php', 'application/javascript', 'text/javascript', 'image/svg+xml'];
+        if (!in_array($extension, $allowedExtensions, true) || in_array($detectedMime, $blockedMimes, true)) {
             return response()->json([
                 'success' => false,
                 'message' => 'Format dokumen harus berupa PDF, JPG, JPEG, atau PNG.',

@@ -98,14 +98,14 @@ const ApplicantDetail = () => {
   // Schedule Interview Modal State (STEP 15D)
   const [showScheduleModal, setShowScheduleModal] = useState(false);
   const [scheduling, setScheduling] = useState(false);
-  const [scheduleForm, setScheduleForm] = useState({
+  const [scheduleForm, setScheduleForm] = useState(() => ({
     interview_date: new Date(Date.now() + 86400000).toISOString().split('T')[0],
     interview_time: '10:00',
     method: 'online',
     meeting_link: '',
     location: '',
     notes: '',
-  });
+  }));
   const [scheduleErrors, setScheduleErrors] = useState({});
 
   // Recruiter Note Input State

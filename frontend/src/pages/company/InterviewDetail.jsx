@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, Link, useNavigate } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import companyService from '../../services/companyService';
 import LoadingScreen from '../../components/common/LoadingScreen';
 import ErrorState from '../../components/common/ErrorState';
@@ -53,7 +53,6 @@ const formatTime = (timeStr) => {
 
 const InterviewDetail = () => {
   const { id } = useParams();
-  const navigate = useNavigate();
 
   const [interview, setInterview] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -72,10 +71,6 @@ const InterviewDetail = () => {
     notes: '',
   });
   const [formErrors, setFormErrors] = useState({});
-
-  useEffect(() => {
-    loadInterview();
-  }, [id]);
 
   const loadInterview = async () => {
     try {
@@ -104,6 +99,11 @@ const InterviewDetail = () => {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    loadInterview();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id]);
 
   // Quick Status Change
   const handleUpdateStatus = async (newStatus) => {

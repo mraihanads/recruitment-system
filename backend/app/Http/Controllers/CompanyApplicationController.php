@@ -93,9 +93,7 @@ class CompanyApplicationController extends Controller
         $company = $this->getCompany($request);
         $application = Application::with([
             'jobVacancy',
-            'candidateProfile.educations',
-            'candidateProfile.experiences',
-            'candidateProfile.portfolios',
+            'candidateProfile.user:id,email',
             'candidateProfile.skills',
             'statusHistories.changer:id,name',
             'interviews',
@@ -120,7 +118,7 @@ class CompanyApplicationController extends Controller
         $effectiveCvUrl = $effectiveCvFile
             ? (str_starts_with($effectiveCvFile, 'http')
                 ? $effectiveCvFile
-                : 'http://127.0.0.1:8000/storage/' . ltrim(preg_replace('/^public\//', '', $effectiveCvFile), '/'))
+                : url('storage/' . ltrim(preg_replace('/^public\//', '', $effectiveCvFile), '/')))
             : null;
 
         return response()->json([
@@ -187,8 +185,8 @@ class CompanyApplicationController extends Controller
         $candidate = $application->candidateProfile;
         $job = $application->jobVacancy;
 
-        $candSkills = $candidate->skills()->pluck('name', 'skills.id')->toArray();
-        $jobSkills = $job->skills()->pluck('name', 'skills.id')->toArray();
+        $candSkills = $candidate->skills->pluck('name', 'id')->toArray();
+        $jobSkills = $job->skills->pluck('name', 'id')->toArray();
 
         $matchedSkillNames = [];
         $missingSkillNames = [];

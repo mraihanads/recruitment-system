@@ -16,8 +16,13 @@ class SkillMatchingService
      */
     public function calculate(CandidateProfile $candidate, JobVacancy $job): array
     {
-        $candidateSkillIds = $candidate->skills()->pluck('skills.id')->toArray();
-        $requiredSkills = $job->skills()->select('skills.id', 'skills.name')->get();
+        $candidateSkillIds = $candidate->relationLoaded('skills')
+            ? $candidate->skills->pluck('id')->all()
+            : $candidate->skills()->pluck('skills.id')->all();
+
+        $requiredSkills = $job->relationLoaded('skills')
+            ? $job->skills
+            : $job->skills()->select('skills.id', 'skills.name')->get();
 
         $totalRequired = $requiredSkills->count();
         if ($totalRequired === 0) {
@@ -31,11 +36,12 @@ class SkillMatchingService
             ];
         }
 
+        $candidateSkillMap = array_flip($candidateSkillIds);
         $matchedCount = 0;
         $skillsBreakdown = [];
 
         foreach ($requiredSkills as $skill) {
-            $isMatched = in_array($skill->id, $candidateSkillIds, true);
+            $isMatched = isset($candidateSkillMap[$skill->id]);
             if ($isMatched) {
                 $matchedCount++;
             }

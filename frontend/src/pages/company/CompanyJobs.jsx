@@ -71,6 +71,22 @@ const CompanyJobs = () => {
   const [updatingId, setUpdatingId] = useState(null);
   const [feedback, setFeedback] = useState({ type: '', message: '' });
 
+  // Load static filter metadata & company verification status once on mount
+  useEffect(() => {
+    let active = true;
+    Promise.all([
+      companyService.getJobCategories().catch(() => ({ data: [] })),
+      companyService.getProfile().catch(() => null),
+    ]).then(([catsRes, profileRes]) => {
+      if (!active) return;
+      if (catsRes?.data) setCategories(catsRes.data || []);
+      if (profileRes?.data) setCompany(profileRes.data);
+    });
+    return () => {
+      active = false;
+    };
+  }, []);
+
   const fetchJobs = useCallback(async () => {
     setLoading(true);
     setError(null);
@@ -80,27 +96,16 @@ const CompanyJobs = () => {
       if (statusFilter) params.status = statusFilter;
       if (categoryFilter) params.category_id = categoryFilter;
 
-      const [jobsRes, catsRes, profileRes] = await Promise.all([
-        companyService.getJobs(params),
-        categories.length === 0 ? companyService.getJobCategories().catch(() => ({ data: [] })) : Promise.resolve({ data: categories }),
-        companyService.getProfile().catch(() => null),
-      ]);
-
+      const jobsRes = await companyService.getJobs(params);
       if (jobsRes?.success) {
         setJobs(jobsRes.data || []);
-      }
-      if (catsRes?.data && categories.length === 0) {
-        setCategories(catsRes.data || []);
-      }
-      if (profileRes?.data) {
-        setCompany(profileRes.data);
       }
     } catch (err) {
       setError(err.response?.data?.message || 'Gagal memuat daftar lowongan pekerjaan.');
     } finally {
       setLoading(false);
     }
-  }, [search, statusFilter, categoryFilter, categories.length]);
+  }, [search, statusFilter, categoryFilter]);
 
   useEffect(() => {
     fetchJobs();

@@ -33,7 +33,7 @@ class CandidateProfile extends Model
             return $this->photo;
         }
         $clean = ltrim(preg_replace('/^public\//', '', $this->photo), '/');
-        return "http://127.0.0.1:8000/storage/{$clean}";
+        return url("storage/{$clean}");
     }
 
     public function getCvUrlAttribute(): ?string
@@ -43,7 +43,7 @@ class CandidateProfile extends Model
             return $this->cv_file;
         }
         $clean = ltrim(preg_replace('/^public\//', '', $this->cv_file), '/');
-        return "http://127.0.0.1:8000/storage/{$clean}";
+        return url("storage/{$clean}");
     }
 
     public function user(): BelongsTo

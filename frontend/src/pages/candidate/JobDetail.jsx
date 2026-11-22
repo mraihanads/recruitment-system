@@ -67,6 +67,11 @@ const JobDetail = () => {
 
   const [isApplyModalOpen, setIsApplyModalOpen] = useState(false);
   const [feedbackMessage, setFeedbackMessage] = useState(null);
+  const [todayStart] = useState(() => {
+    const d = new Date();
+    d.setHours(0, 0, 0, 0);
+    return d;
+  });
 
   const fetchData = async () => {
     setLoading(true);
@@ -196,7 +201,7 @@ const JobDetail = () => {
   })();
 
   const empType = employmentTypeLabels[jobData.employment_type] || jobData.employment_type || 'Full Time';
-  const isDeadlinePassed = jobData.deadline ? new Date(jobData.deadline) < new Date(new Date().setHours(0, 0, 0, 0)) : false;
+  const isDeadlinePassed = jobData.deadline ? new Date(jobData.deadline) < todayStart : false;
   const isClosed = jobData.status !== 'active' || isDeadlinePassed;
 
   const matchPercentage = matchData?.match_percentage ?? 0;

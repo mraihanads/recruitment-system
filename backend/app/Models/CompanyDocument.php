@@ -35,7 +35,7 @@ class CompanyDocument extends Model
             return $this->document_file;
         }
         $clean = ltrim(preg_replace('/^public\//', '', $this->document_file), '/');
-        return "http://127.0.0.1:8000/storage/{$clean}";
+        return url("storage/{$clean}");
     }
 
     public function company(): BelongsTo

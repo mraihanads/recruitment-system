@@ -37,11 +37,7 @@ const formatDate = (dateString) => {
 
 const JobsPage = () => {
   const { isAuthenticated, role } = useAuth();
-
-  // If candidate is logged in, redirect directly to candidate jobs view for matching percentage
-  if (isAuthenticated && role === 'candidate') {
-    return <Navigate to="/candidate/jobs" replace />;
-  }
+  const isCandidateAuth = isAuthenticated && role === 'candidate';
 
   const [searchParams] = useSearchParams();
   const [jobs, setJobs] = useState([]);
@@ -52,6 +48,8 @@ const JobsPage = () => {
   const [selectedType, setSelectedType] = useState('');
 
   useEffect(() => {
+    if (isCandidateAuth) return;
+
     let isMounted = true;
     const fetchPublicData = async () => {
       try {
@@ -83,7 +81,7 @@ const JobsPage = () => {
     return () => {
       isMounted = false;
     };
-  }, []);
+  }, [isCandidateAuth]);
 
   const filteredJobs = useMemo(() => {
     return jobs.filter((job) => {
@@ -107,6 +105,11 @@ const JobsPage = () => {
       return matchSearch && matchCat && matchType;
     });
   }, [jobs, searchTerm, selectedCategory, selectedType]);
+
+  // If candidate is logged in, redirect directly to candidate jobs view for matching percentage
+  if (isCandidateAuth) {
+    return <Navigate to="/candidate/jobs" replace />;
+  }
 
   const handleResetFilters = () => {
     setSearchTerm('');

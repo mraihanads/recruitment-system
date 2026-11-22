@@ -38,7 +38,7 @@ class Application extends Model
             return $this->cv_file;
         }
         $clean = ltrim(preg_replace('/^public\//', '', $this->cv_file), '/');
-        return "http://127.0.0.1:8000/storage/{$clean}";
+        return url("storage/{$clean}");
     }
 
     public function getCoverLetterFilesAttribute(): array
@@ -62,7 +62,7 @@ class Application extends Model
             if (!is_string($p) || empty($p)) continue;
             $url = (str_starts_with($p, 'http://') || str_starts_with($p, 'https://'))
                 ? $p
-                : "http://127.0.0.1:8000/storage/" . ltrim(preg_replace('/^public\//', '', $p), '/');
+                : url('storage/' . ltrim(preg_replace('/^public\//', '', $p), '/'));
             $result[] = [
                 'path' => $p,
                 'name' => basename($p),

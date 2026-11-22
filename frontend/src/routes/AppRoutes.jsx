@@ -21,7 +21,6 @@ import CandidateDashboard from '../pages/dashboard/CandidateDashboard';
 // Admin Modules (STEP 16)
 import UserManagement from '../pages/admin/UserManagement';
 import CompanyVerification from '../pages/admin/CompanyVerification';
-import CompanyDocuments from '../pages/admin/CompanyDocuments';
 import JobModeration from '../pages/admin/JobModeration';
 import JobCategories from '../pages/admin/JobCategories';
 import ApplicationMonitoring from '../pages/admin/ApplicationMonitoring';
@@ -42,9 +41,6 @@ import CompanyNotifications from '../pages/company/CompanyNotifications';
 
 // Candidate Profile Modules (STEP 14A)
 import CandidateProfile from '../pages/candidate/CandidateProfile';
-import CandidateEducation from '../pages/candidate/CandidateEducation';
-import CandidateExperience from '../pages/candidate/CandidateExperience';
-import CandidatePortfolio from '../pages/candidate/CandidatePortfolio';
 import CandidateSkills from '../pages/candidate/CandidateSkills';
 
 // Candidate Job Search & Application (STEP 14B)

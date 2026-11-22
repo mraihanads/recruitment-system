@@ -75,6 +75,21 @@ const Applicants = () => {
   const [selectedJob, setSelectedJob] = useState(initialJobId);
   const [selectedStatus, setSelectedStatus] = useState('');
 
+  // Load company jobs once for filter dropdown (prevents duplicate applicant refetches)
+  useEffect(() => {
+    let active = true;
+    companyService.getJobs()
+      .then((res) => {
+        if (active && res?.data) {
+          setJobs(res.data || []);
+        }
+      })
+      .catch(() => {});
+    return () => {
+      active = false;
+    };
+  }, []);
+
   const fetchApplicants = useCallback(async () => {
     setLoading(true);
     setError(null);
@@ -83,23 +98,16 @@ const Applicants = () => {
       if (selectedJob) params.job_id = selectedJob;
       if (selectedStatus) params.status = selectedStatus;
 
-      const [appsRes, jobsRes] = await Promise.all([
-        companyService.getApplicants(params),
-        jobs.length === 0 ? companyService.getJobs().catch(() => ({ data: [] })) : Promise.resolve({ data: jobs }),
-      ]);
-
+      const appsRes = await companyService.getApplicants(params);
       if (appsRes?.success) {
         setApplicants(appsRes.data || []);
-      }
-      if (jobsRes?.data && jobs.length === 0) {
-        setJobs(jobsRes.data || []);
       }
     } catch (err) {
       setError(err.response?.data?.message || 'Gagal memuat daftar pelamar kerja.');
     } finally {
       setLoading(false);
     }
-  }, [selectedJob, selectedStatus, jobs.length]);
+  }, [selectedJob, selectedStatus]);
 
   useEffect(() => {
     fetchApplicants();

@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import adminService from '../../services/adminService';
-import StatCard from '../../components/dashboard/StatCard';
 import SectionCard from '../../components/dashboard/SectionCard';
 import LoadingScreen from '../../components/common/LoadingScreen';
 import ErrorState from '../../components/common/ErrorState';

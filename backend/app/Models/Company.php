@@ -31,7 +31,7 @@ class Company extends Model
             return $value;
         }
         $clean = ltrim(preg_replace('/^public\//', '', $value), '/');
-        return "http://127.0.0.1:8000/storage/{$clean}";
+        return url("storage/{$clean}");
     }
 
     public function getLogoUrlAttribute(): ?string

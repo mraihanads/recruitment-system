@@ -54,7 +54,7 @@ class AdminJobController extends Controller
             $query->where('company_id', $request->query('company_id'));
         }
 
-        $perPage = (int) $request->query('per_page', 10);
+        $perPage = max(1, min((int) $request->query('per_page', 10), 100));
         $jobs = $query->latest()->paginate($perPage);
 
         return response()->json([

@@ -9,6 +9,7 @@ use App\Models\JobVacancy;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class AdminDashboardController extends Controller
 {
@@ -17,23 +18,35 @@ class AdminDashboardController extends Controller
      */
     public function dashboard(Request $request): JsonResponse
     {
-        $totalUsers = User::count();
-        $totalCandidates = User::where('role', 'candidate')->count();
-        $totalCompanies = User::where('role', 'company')->count();
+        $userCounts = User::select('role', DB::raw('COUNT(*) as total'))
+            ->groupBy('role')
+            ->pluck('total', 'role');
+        $totalUsers = (int) $userCounts->sum();
+        $totalCandidates = (int) ($userCounts['candidate'] ?? 0);
+        $totalCompanies = (int) ($userCounts['company'] ?? 0);
 
-        $pendingCompanies = Company::where('verification_status', 'pending')->count();
-        $verifiedCompanies = Company::where('verification_status', 'verified')->count();
-        $rejectedCompanies = Company::where('verification_status', 'rejected')->count();
+        $companyCounts = Company::select('verification_status', DB::raw('COUNT(*) as total'))
+            ->groupBy('verification_status')
+            ->pluck('total', 'verification_status');
+        $pendingCompanies = (int) ($companyCounts['pending'] ?? 0);
+        $verifiedCompanies = (int) ($companyCounts['verified'] ?? 0);
+        $rejectedCompanies = (int) ($companyCounts['rejected'] ?? 0);
 
-        $totalJobs = JobVacancy::count();
-        $activeJobs = JobVacancy::where('status', 'active')->count();
-        $closedJobs = JobVacancy::where('status', 'closed')->count();
+        $jobCounts = JobVacancy::select('status', DB::raw('COUNT(*) as total'))
+            ->groupBy('status')
+            ->pluck('total', 'status');
+        $totalJobs = (int) $jobCounts->sum();
+        $activeJobs = (int) ($jobCounts['active'] ?? 0);
+        $closedJobs = (int) ($jobCounts['closed'] ?? 0);
 
-        $totalApplications = Application::count();
-        $pendingApplications = Application::whereIn('status', ['submitted', 'screening'])->count();
-        $interviewApplications = Application::where('status', 'interview')->count();
-        $acceptedApplications = Application::where('status', 'accepted')->count();
-        $rejectedApplications = Application::where('status', 'rejected')->count();
+        $appCounts = Application::select('status', DB::raw('COUNT(*) as total'))
+            ->groupBy('status')
+            ->pluck('total', 'status');
+        $totalApplications = (int) $appCounts->sum();
+        $pendingApplications = (int) (($appCounts['submitted'] ?? 0) + ($appCounts['screening'] ?? 0));
+        $interviewApplications = (int) ($appCounts['interview'] ?? 0);
+        $acceptedApplications = (int) ($appCounts['accepted'] ?? 0);
+        $rejectedApplications = (int) ($appCounts['rejected'] ?? 0);
 
         $totalInterviews = Interview::count();
 
