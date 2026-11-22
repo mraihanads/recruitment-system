@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import candidateService from '../../services/candidateService';
+import chatService from '../../services/chatService';
 import ApplicationStatusBadge, { statusConfig } from '../../components/candidate/ApplicationStatusBadge';
 import ApplicationTimeline from '../../components/candidate/ApplicationTimeline';
 import LoadingScreen from '../../components/common/LoadingScreen';
@@ -38,6 +39,22 @@ const formatDate = (dateString) => {
 
 const ApplicationDetail = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
+  const [startingChat, setStartingChat] = useState(false);
+
+  const handleStartChat = async () => {
+    setStartingChat(true);
+    try {
+      const res = await chatService.startConversation(id);
+      if (res?.data?.id) {
+        navigate(`/candidate/messages?c=${res.data.id}`);
+      }
+    } catch (err) {
+      window.alert(err.response?.data?.message || 'Gagal membuka percakapan.');
+    } finally {
+      setStartingChat(false);
+    }
+  };
 
   const [application, setApplication] = useState(null);
   const [matchData, setMatchData] = useState(null);
@@ -169,14 +186,24 @@ const ApplicationDetail = () => {
           Kembali ke Riwayat Lamaran
         </Link>
 
-        {job.id && (
-          <Link
-            to={`/candidate/jobs/${job.id}`}
-            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold text-blue-600 bg-blue-50 hover:bg-blue-600 hover:text-white transition-all shadow-2xs"
+        <div className="flex items-center gap-2.5">
+          <button
+            type="button"
+            onClick={handleStartChat}
+            disabled={startingChat}
+            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-semibold text-white bg-slate-900 hover:bg-blue-700 transition-colors disabled:opacity-60"
           >
-            Lihat Lowongan Pekerjaan &rarr;
-          </Link>
-        )}
+            {startingChat ? 'Membuka chat...' : 'Chat dengan Perusahaan'}
+          </button>
+          {job.id && (
+            <Link
+              to={`/candidate/jobs/${job.id}`}
+              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold text-blue-600 bg-blue-50 hover:bg-blue-600 hover:text-white transition-all shadow-2xs"
+            >
+              Lihat Lowongan Pekerjaan &rarr;
+            </Link>
+          )}
+        </div>
       </div>
 
       {/* Main Top Header Card */}

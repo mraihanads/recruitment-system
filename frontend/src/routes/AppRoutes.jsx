@@ -55,6 +55,7 @@ import ApplicationDetail from '../pages/candidate/ApplicationDetail';
 import CandidateSavedJobs from '../pages/candidate/CandidateSavedJobs';
 import CandidateInterviews from '../pages/candidate/CandidateInterviews';
 import CandidateNotifications from '../pages/candidate/CandidateNotifications';
+import ChatPage from '../pages/shared/ChatPage';
 
 const AppRoutes = () => {
   return (
@@ -144,6 +145,7 @@ const AppRoutes = () => {
         {/* Company Reports & Statistics (STEP 15E) */}
         <Route path="reports" element={<Reports />} />
         <Route path="notifications" element={<CompanyNotifications />} />
+        <Route path="messages" element={<ChatPage />} />
         <Route path="*" element={<Navigate to="dashboard" replace />} />
       </Route>
 
@@ -188,6 +190,7 @@ const AppRoutes = () => {
         <Route path="saved-jobs" element={<CandidateSavedJobs />} />
         <Route path="interviews" element={<CandidateInterviews />} />
         <Route path="notifications" element={<CandidateNotifications />} />
+        <Route path="messages" element={<ChatPage />} />
         <Route path="*" element={<Navigate to="dashboard" replace />} />
       </Route>
 

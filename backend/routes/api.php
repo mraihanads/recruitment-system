@@ -26,6 +26,7 @@ use App\Http\Controllers\AdminJobController;
 use App\Http\Controllers\AdminNotificationController;
 use App\Http\Controllers\AdminReportController;
 use App\Http\Controllers\AdminUserController;
+use App\Http\Controllers\ChatController;
 use App\Http\Controllers\JobController;
 use App\Http\Controllers\PrivateFileController;
 use App\Http\Controllers\SavedJobController;
@@ -55,6 +56,8 @@ Route::middleware('signed')->prefix('files/signed')->group(function () {
         ->name('private.files.application-cv');
     Route::get('/applications/{applicationId}/attachment/{index}', [PrivateFileController::class, 'signedApplicationAttachment'])
         ->name('private.files.application-attachment');
+    Route::get('/chat-attachments/{id}', [ChatController::class, 'attachment'])
+        ->name('chat.attachment');
 });
 
 // Authenticated Routes
@@ -68,6 +71,14 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/candidate-cv/{profileId}', [PrivateFileController::class, 'downloadCandidateCv']);
         Route::get('/applications/{applicationId}/cv', [PrivateFileController::class, 'downloadApplicationCv']);
         Route::get('/applications/{applicationId}/attachment/{index}', [PrivateFileController::class, 'downloadApplicationAttachment']);
+    });
+
+    // Chat between candidate & company (participants only, ownership checked in controller)
+    Route::middleware('role:candidate,company')->prefix('chat')->group(function () {
+        Route::get('/conversations', [ChatController::class, 'index']);
+        Route::post('/applications/{applicationId}/conversation', [ChatController::class, 'start']);
+        Route::get('/conversations/{id}/messages', [ChatController::class, 'messages']);
+        Route::post('/conversations/{id}/messages', [ChatController::class, 'send']);
     });
 
     // Master Categories & Skills (Shared for candidate, company & admin)

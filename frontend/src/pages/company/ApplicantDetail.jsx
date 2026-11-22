@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import companyService from '../../services/companyService';
+import chatService from '../../services/chatService';
 import LoadingScreen from '../../components/common/LoadingScreen';
 import ErrorState from '../../components/common/ErrorState';
 
@@ -82,6 +83,22 @@ const resolveMediaUrl = (path) => {
 
 const ApplicantDetail = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
+  const [startingChat, setStartingChat] = useState(false);
+
+  const handleStartChat = async () => {
+    setStartingChat(true);
+    try {
+      const res = await chatService.startConversation(id);
+      if (res?.data?.id) {
+        navigate(`/company/messages?c=${res.data.id}`);
+      }
+    } catch (err) {
+      window.alert(err.response?.data?.message || 'Gagal membuka percakapan.');
+    } finally {
+      setStartingChat(false);
+    }
+  };
 
   const [detailData, setDetailData] = useState(null);
   const [matchData, setMatchData] = useState(null);
@@ -282,14 +299,24 @@ const ApplicantDetail = () => {
           Kembali ke Daftar Pelamar
         </Link>
 
-        {job.id && (
-          <Link
-            to={`/company/jobs/${job.id}`}
-            className="text-xs font-bold text-blue-600 hover:underline"
+        <div className="flex items-center gap-3">
+          <button
+            type="button"
+            onClick={handleStartChat}
+            disabled={startingChat}
+            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-semibold text-white bg-slate-900 hover:bg-blue-700 transition-colors disabled:opacity-60"
           >
-            Lihat Lowongan: {job.title} &rarr;
-          </Link>
-        )}
+            {startingChat ? 'Membuka chat...' : 'Chat dengan Kandidat'}
+          </button>
+          {job.id && (
+            <Link
+              to={`/company/jobs/${job.id}`}
+              className="text-xs font-bold text-blue-600 hover:underline"
+            >
+              Lihat Lowongan: {job.title} &rarr;
+            </Link>
+          )}
+        </div>
       </div>
 
       {/* Global Feedback Banner */}
