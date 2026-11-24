@@ -142,6 +142,11 @@ const JobCard = ({
 
         {/* Badges / Meta tags */}
         <div className="flex flex-wrap items-center gap-2 mb-3.5">
+          {job.match_percentage !== undefined && job.match_percentage !== null && (
+            <span className="px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-700 text-[11px] font-bold border border-emerald-200">
+              {Math.round(job.match_percentage)}% Match
+            </span>
+          )}
           {job.category?.name && (
             <span className="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-100 text-slate-700">
               {job.category.name}
@@ -172,6 +177,23 @@ const JobCard = ({
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
               <span>{formattedSalary}</span>
+            </div>
+          )}
+          {job.interview_method && (
+            <div className="flex items-center gap-1.5 text-slate-600">
+              <svg className="w-4 h-4 text-slate-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+              </svg>
+              <span>
+                Interview:{' '}
+                <strong className="font-semibold text-slate-700">
+                  {job.interview_method === 'offline'
+                    ? 'Offline'
+                    : job.interview_method === 'both'
+                      ? 'Online / Offline'
+                      : 'Online'}
+                </strong>
+              </span>
             </div>
           )}
           {job.deadline && (

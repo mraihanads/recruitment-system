@@ -24,6 +24,7 @@ class JobVacancy extends Model
         'salary_max',
         'education',
         'deadline',
+        'interview_method',
         'interview_start_date',
         'interview_end_date',
         'announcement_date',

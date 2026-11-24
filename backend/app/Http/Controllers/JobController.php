@@ -73,7 +73,35 @@ class JobController extends Controller
         }
 
         $perPage = max(1, min((int) $request->get('per_page', 10), 100));
-        $jobs = $query->latest()->paginate($perPage);
+
+        // If authenticated as a candidate with skills, sort jobs by highest skill match first.
+        $user = $request->user() ?? auth('sanctum')->user();
+        $candidate = ($user && $user->role === 'candidate') ? $user->candidateProfile : null;
+        $candidateSkillIds = $candidate ? $candidate->skills()->pluck('skills.id')->all() : [];
+
+        if (!empty($candidateSkillIds)) {
+            $jobs = $query
+                ->withCount([
+                    'skills as total_skills_count',
+                    'skills as matched_skills_count' => function ($q) use ($candidateSkillIds) {
+                        $q->whereIn('skills.id', $candidateSkillIds);
+                    },
+                ])
+                ->orderByRaw('CASE WHEN total_skills_count > 0 THEN (matched_skills_count / total_skills_count) ELSE 0 END DESC')
+                ->orderByDesc('matched_skills_count')
+                ->orderByDesc('job_vacancies.created_at')
+                ->orderByDesc('job_vacancies.id')
+                ->paginate($perPage);
+
+            $jobs->getCollection()->transform(function ($job) {
+                $total = (int) ($job->total_skills_count ?? 0);
+                $matched = (int) ($job->matched_skills_count ?? 0);
+                $job->setAttribute('match_percentage', $total > 0 ? round(($matched / $total) * 100, 2) : 0.0);
+                return $job;
+            });
+        } else {
+            $jobs = $query->latest()->paginate($perPage);
+        }
 
         return response()->json([
             'success' => true,

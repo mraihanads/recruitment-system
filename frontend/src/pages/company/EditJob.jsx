@@ -25,6 +25,7 @@ const EditJob = () => {
     salary_max: '',
     education: 'S1/D4',
     deadline: '',
+    interview_method: 'online',
     interview_start_date: '',
     interview_end_date: '',
     announcement_date: '',
@@ -64,6 +65,7 @@ const EditJob = () => {
             salary_max: job.salary_max !== null ? String(job.salary_max) : '',
             education: job.education || 'S1/D4',
             deadline: job.deadline ? job.deadline.substring(0, 10) : '',
+            interview_method: job.interview_method || 'online',
             interview_start_date: job.interview_start_date ? job.interview_start_date.substring(0, 10) : '',
             interview_end_date: job.interview_end_date ? job.interview_end_date.substring(0, 10) : '',
             announcement_date: job.announcement_date ? job.announcement_date.substring(0, 10) : '',
@@ -151,6 +153,7 @@ const EditJob = () => {
         salary_max: formData.salary_max ? Number(formData.salary_max) : null,
         education: formData.education.trim() || null,
         deadline: formData.deadline,
+        interview_method: formData.interview_method || 'online',
         interview_start_date: formData.interview_start_date || null,
         interview_end_date: formData.interview_end_date || null,
         announcement_date: formData.announcement_date || null,
@@ -454,6 +457,22 @@ const EditJob = () => {
                   <p className="text-[11px] text-rose-600 mt-1">{fieldErrors.interview_end_date[0]}</p>
                 )}
               </div>
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold text-slate-700 mb-1">
+                Metode Wawancara (Informasi untuk Kandidat)
+              </label>
+              <select
+                name="interview_method"
+                value={formData.interview_method}
+                onChange={handleInputChange}
+                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 bg-white"
+              >
+                <option value="online">Online (Meeting)</option>
+                <option value="offline">Offline (Tatap Muka)</option>
+                <option value="both">Online / Offline (Fleksibel)</option>
+              </select>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
